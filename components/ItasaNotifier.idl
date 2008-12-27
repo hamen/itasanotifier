@@ -1,0 +1,8 @@
+#include "nsISupports.idl" 
+
+[scriptable, uuid(67b97089-c599-4483-8d53-aa3c0c6089ef)]
+interface nsIItasaNotifier: nsISupports
+{
+    void reload();
+    void sayHello();
+};

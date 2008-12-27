@@ -1,0 +1,8 @@
+content	itasanotifier	chrome/content/
+locale	itasanotifier	it-IT	locale/it-IT/
+#locale	itasanotifier	en-US	locale/en-US/
+
+overlay	chrome://browser/content/browser.xul	chrome://itasanotifier/content/firefoxOverlay.xul
+
+skin	itasanotifier	classic/1.0	skin/
+style	chrome://global/content/customizeToolbar.xul	chrome://itasanotifier/skin/overlay.css

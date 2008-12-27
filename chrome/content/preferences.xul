@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  This file is part of 'ItasaNotifier' (SamePlace addon).
+
+  'ItasaNotifier' is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License,
+  or any later version.
+  
+  'ItasaNotifier' is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with 'ItasaNotifier'.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://itasanotifier/locale/prefwindow.dtd">
+
+
+<prefwindow id="itasanotifierPreferences"
+	    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	    title="&prefwindow.title;">
+  <prefpane id="pane1"
+	    onpaneload="itasanotifierPreferences.init()"
+	    label="&pane1.title;">
+<!--
+    <preferences>
+      <preference id="boolpref1"
+		  name="extensions.itasanotifier.boolpref"
+		  type="bool"/>
+      <preference id="intpref1"
+		  name="extensions.itasanotifier.intpref"
+		  type="int"/>
+      <preference id="stringpref1"
+		  name="extensions.itasanotifier.stringpref"
+		  type="string"/> 
+    </preferences>
+-->
+
+    
+    <hbox> <!-- hbox contains 2 vbox elements-->
+      <vbox>
+	<!-- Left vbox contains 3 elements-->
+
+	<label value="&thelist.label;" />
+	<listbox id="thelist">
+	  
+	</listbox>
+	<button label="&getlistButton.label;"
+	    oncommand="itasanotifierPreferences.getList()"/>
+      </vbox>
+      
+      <!-- Central vbox contains 2 buttons-->
+      <vbox>
+	<spacer flex="1" />
+	<button label="&addToMyListButton.label;"
+		oncommand="itasanotifierPreferences.addToMyList()"/>
+	<button label="&removeFromMyListButton.label;"
+	    oncommand="itasanotifierPreferences.removeFromMyList()"/>
+	<spacer flex="1" />
+      </vbox>
+      
+      <vbox>
+	<!-- Right vbox contains 2 elements-->
+	<label value="&seriesIWatch.label;" />
+      <listbox id="myserieslist">
+      </listbox>
+      <button label="&saveMyListButton.label;"
+	    oncommand="itasanotifierPreferences.saveMyList()"/>
+      <label id="listHasChanged"
+	     hidden="true"
+	     flex="1"
+	     value="&listHasChanged.label;" />
+      </vbox>
+    </hbox>
+    
+    <!-- TEST BUTTON
+    <button label="Cancel the timer" 
+	    oncommand="itasanotifierPreferences.cancel()"/>
+    -->
+    </prefpane>
+  
+
+  <script type="application/x-javascript;version=1.7" src="preferences.js"/>
+</prefwindow>
+
+

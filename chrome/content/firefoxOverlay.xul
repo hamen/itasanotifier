@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  This file is part of 'ItasaNotifier'.
+
+  'ItasaNotifier' is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License,
+  or any later version.
+  
+  'ItasaNotifier' is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with 'ItasaNotifier'.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<?xml-stylesheet href="chrome://itasanotifier/skin/overlay.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://itasanotifier/locale/itasanotifier.dtd">
+<overlay id="itasanotifier-overlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <window id="main-window">
+    <popupset id="itasa-popupset"/>
+  </window>
+  
+  <script src="overlay.js"/>
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="itasanotifier-strings" src="chrome://itasanotifier/locale/itasanotifier.properties"/>
+  </stringbundleset>
+
+  <menupopup id="menu_ToolsPopup">
+    <menuitem id="itasanotifier-hello" label="&itasanotifier.label;" 
+              oncommand="itasanotifier.onMenuItemCommand(event);"/>
+  </menupopup>
+  <popup id="contentAreaContextMenu">
+    <menuitem id="context-itasanotifier" label="&itasanotifierContext.label;"
+              accesskey="&itasanotifierContext.accesskey;"
+              insertafter="context-stop"
+              oncommand="itasanotifier.onMenuItemCommand(event)"/>
+  </popup>
+  <toolbarpalette id="BrowserToolbarPalette">
+  <toolbarbutton id="itasanotifier-toolbar-button"
+    label="&itasanotifierToolbar.label;"
+    tooltiptext="&itasanotifierToolbar.tooltip;"
+    oncommand="itasanotifier.onToolbarButtonCommand()"
+    class="toolbarbutton-1 chromeclass-toolbar-additional"/>
+  </toolbarpalette>
+
+<statusbar id="status-bar">
+            <statusbarpanel id="itasa-status-bar"
+			    context="itasa-status-popup"
+			    label=""
+			    tooltiptext=""
+			    >
+            </statusbarpanel>
+	</statusbar> 
+
+	<popupset id="itasa-popupset">
+            <popup id="itasa-status-popup">
+              <menuitem label="&itasa-status-popup.start;"
+			oncommand="Components.
+				   classes['@hamen.org/itasanotifier/service;1'].
+				   getService(Components.interfaces.nsIItasaNotifier).
+				   wrappedJSObject.getRSS()"/>
+			
+	      <menuitem label="&itasa-status-popup.stop;"
+			oncommand="Components.
+				   classes['@hamen.org/itasanotifier/service;1'].
+				   getService(Components.interfaces.nsIItasaNotifier).
+				   wrappedJSObject.stopTimer()"/>
+
+	      <menuitem label="&itasa-status-popup.clearStatusBar;"
+			oncommand="Components.
+				   classes['@hamen.org/itasanotifier/service;1'].
+				   getService(Components.interfaces.nsIItasaNotifier).
+				   wrappedJSObject.clearStatusBar()"/>
+
+	      <menuitem label="&itasa-status-popup.showOptions;"
+			oncommand="itasanotifier.onToolbarButtonCommand()"/>
+
+              <menuitem label="&itasa-status-popup.about;"
+			oncommand="itasanotifier.aboutItasaNotifier()"/>
+            </popup>
+        </popupset>
+
+  <script type="application/x-javascript;version=1.7" src="overlay.js"/>
+</overlay>

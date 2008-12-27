@@ -1,0 +1,11 @@
+<!ENTITY itasanotifier.label "Itasa Notifier">
+<!ENTITY itasanotifierContext.label "Itasa Notifier Menuitem">
+<!ENTITY itasanotifierContext.accesskey "I">
+<!ENTITY itasanotifierToolbar.label "Itasa Notifier Toolbar Button">
+<!ENTITY itasanotifierToolbar.tooltip "Accedi alle preferenze!">
+<!ENTITY itasa-status-popup.start "Avvia le notifiche">
+<!ENTITY itasa-status-popup.stop "Ferma le notifiche">
+<!ENTITY itasa-status-popup.about "About">
+<!ENTITY itasa-status-popup.clearStatusBar "Segna come letti">
+<!ENTITY itasa-status-popup.showOptions "Opzioni">
+

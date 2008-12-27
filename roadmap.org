@@ -1,0 +1,12 @@
+#+STARTUP: overview
+#+TAGS: 
+#+STARTUP: hidestars
+#+SEQ_TODO: TODO DONE
+
+* DOCS
+** XMLHttpRequest per scaricare la pagina web. per i pattern, dipende da che
+   intendi per pattern.scarica la pagina  con xmlhttprequest.poi prendi
+   il documento con req.responseXML 
+   di la` puoi usare le solite funzioni DOM per ricavare gli elementi
+   che ti servono. oppure, se vuoi fare il figo, xpath
+   http://developer.mozilla.org/En/XMLHttpRequest

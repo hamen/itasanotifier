@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/x-javascript">
+    function sayHello() {
+        Components
+            .classes['@hamen.org/itasanotifier/service;1']
+            .getService(Components.interfaces.nsIXPCOMComponent)
+            .sayHello();
+    }
+  </script>
+
+  <button label="Test" oncommand="sayHello();"/>
+</window>

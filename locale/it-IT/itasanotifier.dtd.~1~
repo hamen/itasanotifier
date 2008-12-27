@@ -1,0 +1,5 @@
+<!ENTITY itasanotifier.label "Your localized menuitem">
+<!ENTITY itasanotifierContext.label "Your Menuitem">
+<!ENTITY itasanotifierContext.accesskey "Y">
+<!ENTITY itasanotifierToolbar.label "Your Toolbar Button">
+<!ENTITY itasanotifierToolbar.tooltip "This is your toolbar button!">
