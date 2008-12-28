@@ -6,8 +6,8 @@ name=itasanotifier
 branch=devel
 
 workdir=/tmp/release.tmp
-#repourl=git://github.com/bard/$name.git
-repourl=/home/hamen/code/$name
+repourl=git://github.com/hamen/ff-$name.git
+#repourl=/home/hamen/code/itasanotifier/devel
 releasedir=/home/hamen/code/itasanotifier # $name/$branch
 #releasedir=/var/www/repo.hyperstruct.net/public/$name/$branch
 updatepath=$releasedir/update.rdf
@@ -70,10 +70,10 @@ base=`pwd`
 
 # build package
 
-mkdir dist dist/$branch/chrome
+mkdir dist dist/chrome
 
 cd $base/chrome
-zip -y -r ../dist/$branch/chrome/$name.jar .
+zip -y -r ../dist/chrome/$name.jar .
 
 cd $base
 [ -d defaults ] && cp -a defaults dist
