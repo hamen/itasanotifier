@@ -30,15 +30,19 @@
   </stringbundleset>
 
   <menupopup id="menu_ToolsPopup">
-    <menuitem id="itasanotifier-hello" label="&itasanotifier.label;" 
-              oncommand="itasanotifier.onMenuItemCommand(event);"/>
+    <menuitem id="itasanotifier-hello" label="&itasanotifier.label;"
+	      oncommand="itasanotifier.onMenuItemCommand(event);"/>
   </menupopup>
+  
+<!--
   <popup id="contentAreaContextMenu">
     <menuitem id="context-itasanotifier" label="&itasanotifierContext.label;"
               accesskey="&itasanotifierContext.accesskey;"
               insertafter="context-stop"
               oncommand="itasanotifier.onMenuItemCommand(event)"/>
   </popup>
+-->
+
   <toolbarpalette id="BrowserToolbarPalette">
   <toolbarbutton id="itasanotifier-toolbar-button"
     label="&itasanotifierToolbar.label;"
