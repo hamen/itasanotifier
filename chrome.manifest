@@ -1,6 +1,6 @@
 content	itasanotifier	chrome/content/
 locale	itasanotifier	it-IT	locale/it-IT/
-#locale	itasanotifier	en-US	locale/en-US/
+locale	itasanotifier	en-US	locale/en-US/
 
 overlay	chrome://browser/content/browser.xul	chrome://itasanotifier/content/firefoxOverlay.xul
 

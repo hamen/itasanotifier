@@ -1,10 +1,10 @@
 <!ENTITY prefwindow.title "ItasaNotifier Opzioni">
 <!ENTITY pane1.title "ItasaNotifier Opzioni">
 <!ENTITY getlistButton.label "Update list">
-<!ENTITY thelist.label "ItaSa TV Series">
+<!ENTITY thelist.label "Itasa TV Series">
 <!ENTITY seriesIWatch.label "TV Series I watch">
 <!ENTITY addToMyListButton.label "Add">
 <!ENTITY removeFromMyListButton.label "Remove">
 <!ENTITY saveMyListButton.label "Save">
-<!ENTITY listHasChanged.label "Save before exit ;\)">
+<!ENTITY listHasChanged.label "Save before exit ;)">
 
