@@ -1,5 +1,11 @@
-<!ENTITY itasanotifier.label "Your localized menuitem">
-<!ENTITY itasanotifierContext.label "Your Menuitem">
-<!ENTITY itasanotifierContext.accesskey "Y">
-<!ENTITY itasanotifierToolbar.label "Your Toolbar Button">
-<!ENTITY itasanotifierToolbar.tooltip "This is your toolbar button!">
+<!ENTITY itasanotifier.label "Itasa Notifier">
+<!ENTITY itasanotifierContext.label "Itasa Notifier Menuitem">
+<!ENTITY itasanotifierContext.accesskey "I">
+<!ENTITY itasanotifierToolbar.label "Itasa Notifier Toolbar Button">
+<!ENTITY itasanotifierToolbar.tooltip "Preferences">
+<!ENTITY itasa-status-popup.start "Start updates">
+<!ENTITY itasa-status-popup.stop "Stop updates">
+<!ENTITY itasa-status-popup.about "About">
+<!ENTITY itasa-status-popup.clearStatusBar "Mark as read">
+<!ENTITY itasa-status-popup.showOptions "Options">
+
