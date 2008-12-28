@@ -9,7 +9,7 @@
     <em:description>Get notified about ItalianSubs.net releases</em:description>
     <em:homepageURL>http://itasanotifier.hamen.org</em:homepageURL>
     <em:aboutURL>chrome://itasanotifier/content/about.xul</em:aboutURL>
-    <em:optionsURL>chrome://itasanotifier/content/options.xul</em:optionsURL>
+    <em:optionsURL>chrome://itasanotifier/content/preferences.xul</em:optionsURL>
     <em:iconURL>chrome://itasanotifier/skin/logo.gif</em:iconURL>
     <em:targetApplication>
       <Description>
