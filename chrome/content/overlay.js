@@ -102,6 +102,9 @@ var itasanotifier = {
   
     // Event called periodically using the timer
     var event = { notify: function(timer) {
+	// Reset previous tooltipText
+	statusbar.tooltipText= "";
+
 	req.open("GET", url, true);
 	req.onreadystatechange = function (aEvt) {  
 	  if (req.readyState == 4) {  
