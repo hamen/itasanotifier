@@ -10,3 +10,6 @@
    di la` puoi usare le solite funzioni DOM per ricavare gli elementi
    che ti servono. oppure, se vuoi fare il figo, xpath
    http://developer.mozilla.org/En/XMLHttpRequest
+
+* FEATURE REQUEST
+** "dovresti far uscire un menu con il collegamento al sub e dopo averlo visto il counter decresce da solo"

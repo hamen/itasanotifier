@@ -26,8 +26,8 @@ var Ci = Components.interfaces;
 var Cr = Components.results;
 
 const pref = Cc['@mozilla.org/preferences-service;1']
-    .getService(Ci.nsIPrefService)
-    .getBranch('extensions.itasanotifier.');
+  .getService(Ci.nsIPrefService)
+  .getBranch('extensions.itasanotifier.');
 
 var seriesarray = new Array();
 var unsavedSeriesArray = new Array();

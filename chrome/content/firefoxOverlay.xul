@@ -54,7 +54,7 @@
 <statusbar id="status-bar">
             <statusbarpanel id="itasa-status-bar"
 			    context="itasa-status-popup"
-			    label=""
+			    label="ItasaNotifier"
 			    tooltiptext=""
 			    >
             </statusbarpanel>
@@ -63,22 +63,13 @@
 	<popupset id="itasa-popupset">
             <popup id="itasa-status-popup">
               <menuitem label="&itasa-status-popup.start;"
-			oncommand="Components.
-				   classes['@hamen.org/itasanotifier/service;1'].
-				   getService(Components.interfaces.nsIItasaNotifier).
-				   wrappedJSObject.getRSS()"/>
+			oncommand="itasanotifier.getRSS()"/>
 			
 	      <menuitem label="&itasa-status-popup.stop;"
-			oncommand="Components.
-				   classes['@hamen.org/itasanotifier/service;1'].
-				   getService(Components.interfaces.nsIItasaNotifier).
-				   wrappedJSObject.stopTimer()"/>
+			oncommand="itasanotifier.stopTimer()"/>
 
 	      <menuitem label="&itasa-status-popup.clearStatusBar;"
-			oncommand="Components.
-				   classes['@hamen.org/itasanotifier/service;1'].
-				   getService(Components.interfaces.nsIItasaNotifier).
-				   wrappedJSObject.clearStatusBar()"/>
+			oncommand="itasanotifier.clearStatusBar()"/>
 
 	      <menuitem label="&itasa-status-popup.showOptions;"
 			oncommand="itasanotifier.onToolbarButtonCommand()"/>

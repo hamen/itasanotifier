@@ -6,12 +6,12 @@ name=itasanotifier
 branch=devel
 
 workdir=/tmp/release.tmp
-repourl=git://github.com/hamen/ff-$name.git
-#repourl=/home/hamen/code/itasanotifier/devel
-releasedir=/home/hamen/code/itasanotifier # $name/$branch
+#repourl=git://github.com/hamen/ff-$name.git
+repourl=/home/hamen/code/itasanotifier/devel
+releasedir=/home/hamen/code/$name/$branch
 #releasedir=/var/www/repo.hyperstruct.net/public/$name/$branch
 updatepath=$releasedir/update.rdf
-updateurl=http://hamen.org/$name/$branch/update.rdf
+updateurl=http://hamen.homelinux.org/$name/$branch/update.rdf
 extid=$name@hamen.org
 
 
@@ -64,7 +64,8 @@ rm -f $releasedir/$name*.xpi
 
 pkgfile=$releasedir/$name-$version.xpi
 pkglink=$releasedir/$name.xpi
-xpiurl=http://hamen.org/$name/$branch/$name-$version.xpi
+#xpiurl=http://hamen.homelinux.org/$name/$branch/$name-$version.xpi
+xpiurl=/home/hamen/code/$name/$name-$version.xpi
 base=`pwd`
 
 
@@ -73,7 +74,7 @@ base=`pwd`
 mkdir dist dist/chrome
 
 cd $base/chrome
-zip -y -r ../dist/chrome/$name.jar .
+zip -y -r ../dist/$name.jar .
 
 cd $base
 [ -d defaults ] && cp -a defaults dist
@@ -95,11 +96,11 @@ ln -sf $pkgfile $pkglink
 
 cd $base
 /usr/local/share/spock/spock \
-    -d /home/bard/secdir \
+    -d /home/hamen/.mozilla/mccoy/6pnlsxoa.default \
     -i urn:mozilla:extension:$extid \
     -v $version \
     -u $xpiurl \
     -f $pkgfile \
-    update.rdf.template >$updatepath
+    update.rdf.template > $updatepath
 
 cleanup
