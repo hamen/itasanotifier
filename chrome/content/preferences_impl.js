@@ -25,7 +25,7 @@ var Cc = Components.classes;
 var Ci = Components.interfaces;
 var Cr = Components.results;
 
-const pref = Cc['@mozilla.org/preferences-service;1']
+const prefs = Cc['@mozilla.org/preferences-service;1']
   .getService(Ci.nsIPrefService)
   .getBranch('extensions.itasanotifier.');
 
@@ -41,7 +41,7 @@ var listHasChanged;
 function init() {
     window.sizeToContent();
     
-    pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
+    pref_savedseriesarray = eval(prefs.getCharPref('seriesIWatch'));
 
     initList = document.getElementById('myserieslist');   
     //    roomsarray.forEach(printElt);
@@ -135,7 +135,7 @@ function saveMyList(){
   unsavedSeriesArray.sort();
 
   pref_savedseriesarray = unsavedSeriesArray.toSource();
-  pref.setCharPref('seriesIWatch', pref_savedseriesarray);
+  prefs.setCharPref('seriesIWatch', pref_savedseriesarray);
   listHasChanged = document.getElementById('listHasChanged');
   listHasChanged.hidden = true;
 }
