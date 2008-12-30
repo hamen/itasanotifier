@@ -103,7 +103,7 @@ var itasanotifier = {
     // Event called periodically using the timer
     var event = { notify: function(timer) {
 	// Reset previous tooltipText
-	statusbar.tooltipText= "";
+	//	statusbar.tooltipText= "";
 
 	req.open("GET", url, true);
 	req.onreadystatechange = function (aEvt) {  
@@ -240,7 +240,7 @@ var itasanotifier = {
   },
   
   // Gets latest 20 subs released
-  getLatest20Subs: function(e){
+  /*  getLatest20Subs: function(e){
     var t;
     var url = "http://www.italiansubs.net/index2.php?option=com_rss";
     
