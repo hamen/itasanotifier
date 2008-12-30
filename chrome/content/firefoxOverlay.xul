@@ -62,6 +62,9 @@
 
 	<popupset id="itasa-popupset">
             <popup id="itasa-status-popup">
+	      <menuitem label="&itasa-status-popup.showLatest20Subs;"
+			oncommand="itasanotifier.showLatest20Subs()"/>
+
               <menuitem label="&itasa-status-popup.start;"
 			oncommand="itasanotifier.getRSS()"/>
 			
@@ -70,6 +73,11 @@
 
 	      <menuitem label="&itasa-status-popup.clearStatusBar;"
 			oncommand="itasanotifier.clearStatusBar()"/>
+
+	      <menuitem id="itasa-status-popup-download"
+			label="&itasa-status-popup.download;"
+			disabled="true"
+			oncommand="itasanotifier.downloadSubs()"/>
 
 	      <menuitem label="&itasa-status-popup.showOptions;"
 			oncommand="itasanotifier.onToolbarButtonCommand()"/>

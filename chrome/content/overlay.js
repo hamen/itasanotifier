@@ -181,6 +181,8 @@ var itasanotifier = {
   clearStatusBar: function(e){
     statusbar.label = itasaProp.GetStringFromName("itasanotifier.title");
     statusbar.tooltipText = latest20subs;
+    var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
+      itasaStatusPopupDownload.disabled = true;
   },
 
   amIInterested: function(e){
@@ -193,28 +195,36 @@ var itasanotifier = {
       for(i=2; i<titles.length; i++){
 	//dump(pref_savedseriesarray[n] + " is equal to " + titles[i].textContent +"?\n");
 	if(titles[i].textContent.indexOf(pref_savedseriesarray[n]) != -1){
+
 	  check = true;
 	  matches++;
+	  statusbar.tooltipText= "";
+
 	  dump("Match found: " + pref_savedseriesarray[n] + " = " + titles[i].textContent + "\n");
 	  statusbar.tooltipText += titles[i].textContent + " | ";
 	}
       }
     }
   
-    latest20subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
+    latest20subs = "\n" + itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
     for(i=2; i<titles.length; i++){
       latest20subs += titles[i].textContent + "\n";
     }
 
+    if(check){
+      var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
+      itasaStatusPopupDownload.disabled = false;
+    }
+    
     if(check && matches>1){
       statusbar.label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") 
       + matches 
       + itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
-      statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs") + statusbar.tooltipText + "\n" + latest20subs;
+      statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ " " + statusbar.tooltipText + "\n" + latest20subs;
     }
     else if(check && matches==1){
       statusbar.label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
-      statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + statusbar.tooltipText + "\n" + latest20subs;
+      statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub")+ " " + statusbar.tooltipText + "\n" + latest20subs;
     }
     
     else {
@@ -253,6 +263,15 @@ var itasanotifier = {
     };  
     req.send(null);
     return t;
+  },
+  */
+  
+  showLatest20Subs: function(e){
+    alert(latest20subs);
+  },
+  
+  downloadSubs: function(e){
+    window.open("http://www.italiansubs.net/index.php?option=com_remository&Itemid=27", null);
   }
 
 };
