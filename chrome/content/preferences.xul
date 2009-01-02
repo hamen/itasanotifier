@@ -27,21 +27,7 @@
   <prefpane id="pane1"
 	    onpaneload="itasanotifierPreferences.init()"
 	    label="&pane1.title;">
-<!--
-    <preferences>
-      <preference id="boolpref1"
-		  name="extensions.itasanotifier.boolpref"
-		  type="bool"/>
-      <preference id="intpref1"
-		  name="extensions.itasanotifier.intpref"
-		  type="int"/>
-      <preference id="stringpref1"
-		  name="extensions.itasanotifier.stringpref"
-		  type="string"/> 
-    </preferences>
--->
-
-    
+   
     <hbox> <!-- hbox contains 2 vbox elements-->
       <vbox>
 	<!-- Left vbox contains 3 elements-->
