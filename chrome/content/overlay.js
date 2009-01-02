@@ -19,11 +19,12 @@
 
 // ----------------------------------------------------------------------
 // GLOBAL DEFINITIONS
-var timer ;
+var timer;
 var pref_savedseriesarray;
 var titles;
 var statusbar;
 var latest20subs;
+var readSubs = [];
 
 /* Enable external scripts import */
 //const loader = Cc['@mozilla.org/moz/jssubscript-loader;1']
@@ -51,7 +52,9 @@ var itasanotifier = {
     
     pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
     statusbar = document.getElementById('itasa-status-bar');
-
+    
+    readSubs[0] = false;
+    //this.readSubs = readSubs;
     // Print the list of series you watch 
     /*
     var i;
@@ -176,7 +179,8 @@ var itasanotifier = {
     statusbar.label = itasaProp.GetStringFromName("itasanotifier.title");
     statusbar.tooltipText = latest20subs;
     var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
-      itasaStatusPopupDownload.disabled = true;
+    itasaStatusPopupDownload.disabled = true;
+    readSubs[0] = true;
   },
 
   amIInterested: function(e){
@@ -235,32 +239,7 @@ var itasanotifier = {
     statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.updatesStopped");
   },
   
-  // Gets latest 20 subs released
-  /*  getLatest20Subs: function(e){
-    var t;
-    var url = "http://www.italiansubs.net/index2.php?option=com_rss";
-    
-    var req = Components.
-    classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-    .createInstance(Components.interfaces.nsIXMLHttpRequest);
 
-    req.open("GET", url, true);
-        
-    req.onreadystatechange = function (aEvt) {  
-      if (req.readyState == 4) {  
-	if(req.status == 200) {
-	  // Gets XML RSS Feed and creates an array of TV Series Titles 
-	  var xmldoc = req.responseXML;
-	  t = xmldoc.getElementsByTagName("title");
-	}
-	else  
-	  dump("Error loading page\n");  
-      }  
-    };  
-    req.send(null);
-    return t;
-  },
-  */
   
   showLatest20Subs: function(e){
     getLatest20Subs();
@@ -274,17 +253,6 @@ var itasanotifier = {
 };
 
 window.addEventListener("load", function(e) {
-    /*  
-    try {
-      Components
-	.classes['@hamen.org/itasanotifier/service;1']
-	.getService(Components.interfaces.nsIItasaNotifier);
-
-    } catch(exp) {
-      Components.utils.reportError(exp); // report the error and continue execution
-    }
-    */
-
     itasanotifier.onLoad(e);
 	
   }, false);
