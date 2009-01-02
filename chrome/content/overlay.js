@@ -75,12 +75,6 @@ var itasanotifier = {
     
     
     //window.open("http://www.italiansubs.net/index.php?option=com_remository&Itemid=27", null);
-    /*
-    var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-                                  .getService(Components.interfaces.nsIPromptService);
-    promptService.alert(window, this.strings.getString("helloMessageTitle"),
-                              this.strings.getString("helloMessage"));
-    */
   },
   onToolbarButtonCommand: function(e) {
     window.openDialog("chrome://itasanotifier/content/preferences.xul");
