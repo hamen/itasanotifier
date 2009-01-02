@@ -79,10 +79,10 @@
     </hbox>
     
     <!-- TEST BUTTON
-    <button label="Cancel the timer" 
-	    oncommand="itasanotifierPreferences.cancel()"/>
+    <button label="Name N Ids" 
+	    oncommand="itasanotifierPreferences.getNamesNIds()"/>
     -->
-    </prefpane>
+  </prefpane>
   
 
   <script type="application/x-javascript;version=1.7" src="preferences.js"/>

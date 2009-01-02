@@ -168,3 +168,52 @@ function getRSS(){
 function printElt(element, index, array) {
     print("[" + index + "] is " + element); // assumes print is already defined
 }
+
+
+function getNamesNIds(){
+  var url = 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=27';
+  var req = new XMLHttpRequest();
+  req.overrideMimeType('text/xml');
+  req.open('GET', url, true); /* 3rd argument, true, marks this as async */
+    
+   req.onreadystatechange = function (aEvt) {
+     if (req.readyState == 4) {
+      if(req.status == 200){
+	var seriesTXTList = req.responseText;
+	var re = new RegExp('("> ).+(</a>)', "g");
+
+	var matches_array = seriesTXTList.match(re);
+	  
+	var series = new Array();
+		
+	var i;
+	// Creates a new array of objects "series": seriesName, seriesId
+	var seriesNid = new Array();
+	re = new RegExp('(&amp;id).+(</a>)', "g");
+	matches_array = seriesTXTList.match(re);
+	// matches_array if full of stuff like this: &amp;id=5"> 24</a></a>
+
+	for(i=2; i < 8; i++){
+	  var temp = matches_array[i].replace('&amp;id=', "", "gi"); // 5"> 24</a></a>
+	  matches_array[i] = temp;
+	  temp = matches_array[i].replace('</a>', "", "gi"); // 5"> 24
+	  matches_array[i] = temp;
+	  temp = matches_array[i].replace('">', "", "gi"); // 5 24
+	  matches_array[i] = temp;
+	  
+	  var seriesObj = {
+	  id: matches_array[i].substring(0, matches_array[i].indexOf(' ')),
+	  name: matches_array[i].substring(matches_array[i].indexOf(' ') , matches_array[i].length)
+	  };
+	  	  
+	  seriesNid[i] = seriesObj;
+	  alert(seriesNid[i].id + " " + seriesNid[i].name);
+	}
+      }
+      else
+	dump("Error loading page\n");
+    }
+   };
+  req.send(null); 
+  
+}
