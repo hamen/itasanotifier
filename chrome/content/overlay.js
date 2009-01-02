@@ -267,6 +267,7 @@ var itasanotifier = {
   */
   
   showLatest20Subs: function(e){
+    getLatest20Subs();
     alert(latest20subs);
   },
   
@@ -292,3 +293,49 @@ window.addEventListener("load", function(e) {
 	
   }, false);
 
+
+function sayHello(msg){
+  alert("Message is: " + msg);
+}
+
+// Gets latest 20 subs released
+function getLatest20Subs(){
+  var l20Subs;
+
+   // URL rss feed
+   var url = "http://www.italiansubs.net/index2.php?option=com_rss";
+
+   var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+     .createInstance(Components.interfaces.nsIXMLHttpRequest);
+   req.open("GET", url, true);
+
+   req.onreadystatechange = function (aEvt) {  
+     if (req.readyState == 4) {  
+       if(req.status == 200) {
+	 // Gets XML RSS Feed and creates an array of TV Series Titles 
+	 var xmldoc = req.responseXML;
+	 titles = xmldoc.getElementsByTagName("title");
+	 var i;
+
+	 // Print titles list for the first time
+	 
+	 dump("\nManual Print" + "\n");
+	 for(i=2; i<titles.length; i++){
+	   dump(titles[i].textContent + "\n");
+	 }
+	 dump("Manual Print" + "\n");
+	 
+
+	 l20Subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
+
+	 for(i=2; i<titles.length; i++){
+	   l20Subs += titles[i].textContent + "\n";
+	 }
+	 latest20subs = l20Subs;
+       }
+       else  
+	 dump("Error loading page\n");  
+     }  
+   };  
+   req.send(null);
+}
