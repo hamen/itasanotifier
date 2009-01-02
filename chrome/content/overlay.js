@@ -181,21 +181,22 @@ var itasanotifier = {
 
   amIInterested: function(e){
     pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
-    //pref_savedseriesarray.forEach(printElt);
     var check = false;
-    
+    statusbar.tooltipText= "";
+
     var i, n, matches = 0;
     for(n=0; n<pref_savedseriesarray.length; n++){
       for(i=2; i<titles.length; i++){
-	//dump(pref_savedseriesarray[n] + " is equal to " + titles[i].textContent +"?\n");
 	if(titles[i].textContent.indexOf(pref_savedseriesarray[n]) != -1){
 
 	  check = true;
 	  matches++;
-	  statusbar.tooltipText= "";
-
-	  dump("Match found: " + pref_savedseriesarray[n] + " = " + titles[i].textContent + "\n");
-	  statusbar.tooltipText += titles[i].textContent + " | ";
+	  if(readSubs[0] == false){
+	    readSubs[i] = titles[i].textContent;
+	    dump("Match found: " + pref_savedseriesarray[n] + " matches " + titles[i].textContent + "\n");
+	    statusbar.tooltipText += titles[i].textContent + "\n";
+	  }
+	  else statusbar.tooltipText= "";
 	}
       }
     }
@@ -205,25 +206,26 @@ var itasanotifier = {
       latest20subs += titles[i].textContent + "\n";
     }
 
-    if(check){
-      var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
-      itasaStatusPopupDownload.disabled = false;
-    }
+    if(readSubs[0] == false){
+      if(check){
+	var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
+	itasaStatusPopupDownload.disabled = false;
+      }
     
-    if(check && matches>1){
-      statusbar.label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") 
-      + matches 
-      + itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
-      statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ " " + statusbar.tooltipText + "\n" + latest20subs;
-    }
-    else if(check && matches==1){
-      statusbar.label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
-      statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub")+ " " + statusbar.tooltipText + "\n" + latest20subs;
-    }
+      if(check && matches>1){
+	statusbar.label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
+	+ matches
+	+ " " + itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
+	statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + statusbar.tooltipText + latest20subs;
+      }
+      else if(check && matches==1){
+	statusbar.label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
+	statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub")+ " " + statusbar.tooltipText + "\n" + latest20subs;
+      }
     
-    else {
-      statusbar.tooltipText = latest20subs;
-    }
+      else {
+	statusbar.tooltipText = latest20subs;
+      }}
   },
 
   stopTimer: function(e){
