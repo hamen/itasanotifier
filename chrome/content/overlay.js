@@ -25,6 +25,8 @@ var titles;
 var statusbar;
 var latest20subs;
 var readSubs = [];
+var seriesNid = new Array();
+var toDownload = [];
 
 /* Enable external scripts import */
 //const loader = Cc['@mozilla.org/moz/jssubscript-loader;1']
@@ -199,6 +201,7 @@ var itasanotifier = {
 	    readSubs[i] = titles[i].textContent;
 	    dump("Match found: " + pref_savedseriesarray[n] + " matches " + titles[i].textContent + "\n");
 	    statusbar.tooltipText += titles[i].textContent + "\n";
+	    toDownload.push(pref_savedseriesarray[n]);
 	  }
 	  else statusbar.tooltipText= "";
 	}
@@ -248,6 +251,15 @@ var itasanotifier = {
   
   downloadSubs: function(e){
     window.open("http://www.italiansubs.net/index.php?option=com_remository&Itemid=27", null);
+    var i, n, url;
+    for(n=0; n<toDownload.length; n++){
+      for(i=2; i< seriesNid.length; i++){
+	if(seriesNid[i].name.indexOf(toDownload[n]) != -1){
+	  url = "http://www.italiansubs.net/index.php?option=com_remository&Itemid=27&func=select&id=" + seriesNid[i].id;
+	  window.open(url, null);
+	}
+      }
+    }
   }
 
 };
