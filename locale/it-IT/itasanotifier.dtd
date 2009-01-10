@@ -8,4 +8,7 @@
 <!ENTITY itasa-status-popup.about "About">
 <!ENTITY itasa-status-popup.clearStatusBar "Segna come letti">
 <!ENTITY itasa-status-popup.showOptions "Opzioni">
+<!ENTITY itasa-status-popup.showLatest20Subs "Mostra gli ultimi 20 sub">
+<!ENTITY itasa-status-popup.download "Scarica i sottotitoli">
+
 
