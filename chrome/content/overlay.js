@@ -227,16 +227,23 @@ var itasanotifier = {
 	statusbar.label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
 	+ matches
 	+ " " + itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
-	statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + statusbar.tooltipText + latest20subs;
+
+	statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + statusbar.tooltipText; // + latest20subs;
       }
       else if(check && matches==1){
 	statusbar.label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
-	statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub")+ " " + statusbar.tooltipText + "\n" + latest20subs;
+	statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") +
+	    "\n" + statusbar.tooltipText; // + "\n" + latest20subs;
       }
-    
       else {
+	getLatest20Subs();
 	statusbar.tooltipText = latest20subs;
-      }}
+      }
+    }
+    else {
+      getLatest20Subs();
+      statusbar.tooltipText = latest20subs;
+    }
   },
 
   stopTimer: function(e){
@@ -245,16 +252,15 @@ var itasanotifier = {
     statusbar.label = "ItasaNotifier";
     statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.updatesStopped");
   },
-  
 
-  
+
+
   showLatest20Subs: function(e){
     getLatest20Subs();
     if(latest20subs) alert(latest20subs);
   },
-  
+
   downloadSubs: function(e){
-    window.open("http://www.italiansubs.net/index.php?option=com_remository&Itemid=27", null);
     var i, n, url;
     for(n=0; n<toDownload.length; n++){
       for(i=2; i< seriesNid.length; i++){
