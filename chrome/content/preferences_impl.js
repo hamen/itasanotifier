@@ -30,10 +30,12 @@ const prefs = Cc['@mozilla.org/preferences-service;1']
   .getBranch('extensions.itasanotifier.');
 
 const url = "http://www.italiansubs.net/Sottotitoli/";
+
 var seriesarray = new Array();
 var unsavedSeriesArray = new Array();
 
 var pref_savedseriesarray;
+
 var initList;
 var listHasChanged;
 
@@ -43,13 +45,14 @@ function init() {
     window.sizeToContent();
     
     pref_savedseriesarray = eval(prefs.getCharPref('seriesIWatch'));
+    //pref_savedserieNidsarray = eval(prefs.getCharPref('seriesIWatch_nameNid'));
 
     initList = document.getElementById('myserieslist');   
-    //    roomsarray.forEach(printElt);
     pref_savedseriesarray.forEach(appendToList);
 }
 
 function getList(){
+  
   //var url = 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=27';
   //var url = 'http://www.ing.unisannio.it/';
   var req = new XMLHttpRequest();
@@ -58,9 +61,7 @@ function getList(){
     
   // defines a function on the fly (called "anonymous function")
   req.onreadystatechange = function (aEvt) {
-     
-
-    if (req.readyState == 4) {
+     if (req.readyState == 4) {
       if(req.status == 200){
 	//Print series page as html
 	//dump(req.responseText);
@@ -71,7 +72,7 @@ function getList(){
 	var matches_array = seriesTXTList.match(re);
 	  
 	var series = new Array();
-	  
+		
 	var i;
 	for(i=0; i < matches_array.length; i++){
 	  var temp = matches_array[i].replace('"> ', "", "gi");
@@ -194,7 +195,7 @@ function getNamesNIds(){
 	matches_array = seriesTXTList.match(re);
 	// matches_array if full of stuff like this: &amp;id=5"> 24</a></a>
 
-	for(i=2; i < 8; i++){
+	for(i=2; i < matches_array.length; i++){
 	  var temp = matches_array[i].replace('&amp;id=', "", "gi"); // 5"> 24</a></a>
 	  matches_array[i] = temp;
 	  temp = matches_array[i].replace('</a>', "", "gi"); // 5"> 24
