@@ -67,6 +67,7 @@ var itasanotifier = {
 	dump(pref_savedseriesarray[i] + "\n");	
       }
     */
+    //getLatest20Subs();
     this.getRSS();
   },
 
@@ -249,7 +250,7 @@ var itasanotifier = {
   
   showLatest20Subs: function(e){
     getLatest20Subs();
-    alert(latest20subs);
+    if(latest20subs) alert(latest20subs);
   },
   
   downloadSubs: function(e){
