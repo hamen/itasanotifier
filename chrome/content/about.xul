@@ -29,7 +29,6 @@
     <vbox>
       <text value="Itasa Notifier"
 	    style="font-weight: bold; font-size: x-large;"/>
-      <text value="&version; 0.1"/>
       <separator class="thin"/>
       <text value="&createdBy; Ivan Morgillo"
 	    style="font-weight: bold;"/>
