@@ -5,7 +5,7 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="itasanotifier@hamen.org"
                    em:name="Itasa Notifier"
-                   em:version="0.1"
+                   em:version="42.0.0"
                    em:creator="Ivan Morgillo"
                    em:description="Get notified about ItalianSubs.net releases"
                    em:homepageURL="http://itasanotifier.hamen.org"
