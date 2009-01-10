@@ -28,6 +28,7 @@ var readSubs = [];
 var seriesNid = new Array();
 var toDownload = [];
 
+const url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
 /* Enable external scripts import */
 //const loader = Cc['@mozilla.org/moz/jssubscript-loader;1']
 //.getService(Ci.mozIJSSubScriptLoader);
@@ -139,7 +140,8 @@ var itasanotifier = {
     timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
   
     // URL rss feed
-    var url = "http://www.italiansubs.net/index2.php?option=com_rss";
+    //    var url = "http://www.italiansubs.net/index2.php?option=com_rss";
+    //    var url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
     
     var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
     .createInstance(Components.interfaces.nsIXMLHttpRequest);
@@ -280,7 +282,7 @@ function getLatest20Subs(){
   var l20Subs;
 
    // URL rss feed
-   var url = "http://www.italiansubs.net/index2.php?option=com_rss";
+   //var url = "http://www.italiansubs.net/index2.php?option=com_rss";
 
    var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
      .createInstance(Components.interfaces.nsIXMLHttpRequest);
@@ -319,7 +321,8 @@ function getLatest20Subs(){
 
 // Gets an array of objects: series id, series name
 function getNamesNIds(){
-  var url = 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=27';
+  //  var url = 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=27';
+  //  var url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
   var req = new XMLHttpRequest();
   req.overrideMimeType('text/xml');
   req.open('GET', url, true); /* 3rd argument, true, marks this as async */

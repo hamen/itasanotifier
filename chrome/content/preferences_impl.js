@@ -29,6 +29,7 @@ const prefs = Cc['@mozilla.org/preferences-service;1']
   .getService(Ci.nsIPrefService)
   .getBranch('extensions.itasanotifier.');
 
+const url = "http://www.italiansubs.net/Sottotitoli/";
 var seriesarray = new Array();
 var unsavedSeriesArray = new Array();
 
@@ -49,7 +50,7 @@ function init() {
 }
 
 function getList(){
-  var url = 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=27';
+  //var url = 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=27';
   //var url = 'http://www.ing.unisannio.it/';
   var req = new XMLHttpRequest();
   req.overrideMimeType('text/xml');
@@ -143,7 +144,7 @@ function saveMyList(){
 // Download XML RSS Feed
 function getRSS(){
   var req = new XMLHttpRequest();
-  var url = "http://www.italiansubs.net/index2.php?option=com_rss";
+  var url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
   req.open('GET', url, true);
   req.onreadystatechange = function (aEvt) {
     if (req.readyState == 4) {
@@ -171,7 +172,7 @@ function printElt(element, index, array) {
 
 
 function getNamesNIds(){
-  var url = 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=27';
+  //var url = 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=27';
   var req = new XMLHttpRequest();
   req.overrideMimeType('text/xml');
   req.open('GET', url, true); /* 3rd argument, true, marks this as async */
