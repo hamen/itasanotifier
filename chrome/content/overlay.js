@@ -27,8 +27,10 @@ var latest20subs;
 var readSubs = [];
 var seriesNid = new Array();
 var toDownload = [];
+var seriesarray = [];
 
 const url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
+const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
 /* Enable external scripts import */
 //const loader = Cc['@mozilla.org/moz/jssubscript-loader;1']
 //.getService(Ci.mozIJSSubScriptLoader);
@@ -47,6 +49,15 @@ const itasaProp = Components.classes["@mozilla.org/intl/stringbundle;1"]
 
 var itasanotifier = {
   onLoad: function() {
+    var firstInstall = eval(pref.getBoolPref('firstInstall'));
+    
+    // Add icon to toolbar on first install
+    if (firstInstall) {
+      var toolbar = document.getElementById('nav-bar');
+      addToolbarButton('itasanotifier-toolbar-button');
+      pref.setBoolPref('firstInstall', false);
+    }
+    
     // initialization code
     this.initialized = true;
     this.strings = document.getElementById("itasanotifier-strings");
@@ -143,7 +154,7 @@ var itasanotifier = {
     // URL rss feed
     //    var url = "http://www.italiansubs.net/index2.php?option=com_rss";
     //    var url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
-    
+
     var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
     .createInstance(Components.interfaces.nsIXMLHttpRequest);
     req.open("GET", url, true);
@@ -193,6 +204,7 @@ var itasanotifier = {
     var check = false;
     statusbar.tooltipText= "";
 
+    
     var i, n, matches = 0;
     for(n=0; n<pref_savedseriesarray.length; n++){
       for(i=2; i<titles.length; i++){
@@ -210,6 +222,12 @@ var itasanotifier = {
 	}
       }
     }
+
+    /*
+    for(n=0; n< toDownload.length; n++){
+      dump(toDownload[n] + "\n");
+    }
+    */
   
     latest20subs = "\n" + itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
     for(i=2; i<titles.length; i++){
@@ -220,7 +238,8 @@ var itasanotifier = {
       if(check){
 	var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
 	itasaStatusPopupDownload.disabled = false;
-	getNamesNIds();
+	//getNamesNIds();
+	getList();
       }
     
       if(check && matches>1){
@@ -263,17 +282,26 @@ var itasanotifier = {
   downloadSubs: function(e){
     var i, n, url;
     for(n=0; n<toDownload.length; n++){
-      for(i=2; i< seriesNid.length; i++){
-	if(seriesNid[i].name.indexOf(toDownload[n]) != -1){
-	  url = "http://www.italiansubs.net/index.php?option=com_remository&Itemid=27&func=select&id=" + seriesNid[i].id;
-	  window.open(url, null);
-	}
+      toDownload[n] = toDownload[n].replace(' ', "-", "gi");
+      toDownload[n] = toDownload[n].replace('\'', "-", "gi");
+      //      alert("toDownload: " + toDownload[n] + "and n is: " + n);
+      url = "http://www.italiansubs.net/Sottotitoli/" + toDownload[n];
+      window.open(url, null);
+
+      /*
+      for(i=2; i< seriesarray.length; i++){
+	if(seriesarray.indexOf(toDownload[n]) != -1){
+	  //url = "http://www.italiansubs.net/index.php?option=com_remository&Itemid=27&func=select&id=" + seriesNid[i].id;
+	
+	  //alert("url is: " + url);
+	  //window.open(url, null);
+	  }*/
       }
     }
-  }
-
+  //alert("fixing it");
 };
 
+// ON LOAD
 window.addEventListener("load", function(e) {
     itasanotifier.onLoad(e);
 	
@@ -290,7 +318,7 @@ function getLatest20Subs(){
 
    // URL rss feed
    //var url = "http://www.italiansubs.net/index2.php?option=com_rss";
-
+  
    var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
      .createInstance(Components.interfaces.nsIXMLHttpRequest);
    req.open("GET", url, true);
@@ -320,19 +348,21 @@ function getLatest20Subs(){
 	 latest20subs = l20Subs;
        }
        else  
-	 dump("Error loading page\n");  
+	 dump("Error loading page\n Req status:" + req.status + "and url: " + url);  
      }  
    };  
    req.send(null);
 }
 
 // Gets an array of objects: series id, series name
+/*
 function getNamesNIds(){
   //  var url = 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=27';
   //  var url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
+
   var req = new XMLHttpRequest();
   req.overrideMimeType('text/xml');
-  req.open('GET', url, true); /* 3rd argument, true, marks this as async */
+  req.open('GET', url, true); // 3rd argument, true, marks this as async 
     
    req.onreadystatechange = function (aEvt) {
      if (req.readyState == 4) {
@@ -372,4 +402,74 @@ function getNamesNIds(){
     }
    };
   req.send(null); 
+}
+*/
+function getList(){
+
+
+  var req = new XMLHttpRequest();
+  req.overrideMimeType('text/xml');
+  req.open('GET', urlSubs, true); /* 3rd argument, true, marks this as async */
+    
+  // defines a function on the fly (called "anonymous function")
+  req.onreadystatechange = function (aEvt) {
+     if (req.readyState == 4) {
+      if(req.status == 200){
+	//Print series page as html
+	//dump(req.responseText);
+	// I know this method sucks, but XML sent from server is wrong and XML parser fails
+	var seriesTXTList = req.responseText;
+	var re = new RegExp('("> ).+(</a>)', "g");
+
+	var matches_array = seriesTXTList.match(re);
+	  
+	var series = new Array();
+		
+	var i;
+	for(i=0; i < matches_array.length; i++){
+	  var temp = matches_array[i].replace('"> ', "", "gi");
+	  matches_array[i] = temp;
+	  temp = matches_array[i].replace('</a>', "", "gi");
+	  series[i]= temp;
+	  seriesarray[i] = temp;
+	  //dump(seriesarray[i] + "\n");
+	}
+      }
+      else
+	dump("Error loading page\n");
+    }
+  };
+  req.send(null); 
+}
+
+
+
+
+function modifyToolbarButtons(modifier) {
+    var toolbar =
+        document.getElementById('nav-bar') ||
+        document.getElementById('mail-bar') ||
+        document.getElementById('mail-bar2');
+
+    if(!toolbar)
+        return;
+
+    if(toolbar.getAttribute('customizable') == 'true') {
+        var newSet = modifier(toolbar.currentSet);
+        if(!newSet)
+            return;
+
+        toolbar.currentSet = newSet;
+        toolbar.setAttribute('currentset', toolbar.currentSet);
+        toolbar.ownerDocument.persist(toolbar.id, 'currentset');
+        try { BrowserToolboxCustomizeDone(true); } catch (e) {}
+    }
+}
+
+function addToolbarButton(buttonId) {
+    modifyToolbarButtons(function(set) {
+        if(set.indexOf(buttonId) == -1)
+            return set.replace(/(urlbar-container|separator)/,
+                               buttonId + ',$1');
+    });
 }
