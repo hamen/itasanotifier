@@ -28,6 +28,7 @@ var readSubs = [];
 var seriesNid = new Array();
 var toDownload = [];
 var seriesarray = [];
+var lastSub;
 
 const url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
 const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
@@ -49,15 +50,14 @@ const itasaProp = Components.classes["@mozilla.org/intl/stringbundle;1"]
 
 var itasanotifier = {
   onLoad: function() {
-    var firstInstall = eval(pref.getBoolPref('firstInstall'));
-    
     // Add icon to toolbar on first install
+    var firstInstall = eval(pref.getBoolPref('firstInstall'));
     if (firstInstall) {
       var toolbar = document.getElementById('nav-bar');
       addToolbarButton('itasanotifier-toolbar-button');
       pref.setBoolPref('firstInstall', false);
     }
-    
+
     // initialization code
     this.initialized = true;
     this.strings = document.getElementById("itasanotifier-strings");
@@ -90,9 +90,6 @@ var itasanotifier = {
   onMenuItemCommand: function(e) {
     // Opens Options Dialog
      window.openDialog("chrome://itasanotifier/content/preferences.xul");
-    
-    
-    //window.open("http://www.italiansubs.net/index.php?option=com_remository&Itemid=27", null);
   },
   onToolbarButtonCommand: function(e) {
     window.openDialog("chrome://itasanotifier/content/preferences.xul");
@@ -107,15 +104,12 @@ var itasanotifier = {
   },
   
   getRSS: function(e){
-    //this.clearStatusBar();
-
+ 
     var count = 0;
     var previousFirstElement;
   
     // Event called periodically using the timer
     var event = { notify: function(timer) {
-	// Reset previous tooltipText
-	//	statusbar.tooltipText= "";
 
 	req.open("GET", url, true);
 	req.onreadystatechange = function (aEvt) {  
@@ -150,11 +144,7 @@ var itasanotifier = {
   
     // Create the timer
     timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
-  
-    // URL rss feed
-    //    var url = "http://www.italiansubs.net/index2.php?option=com_rss";
-    //    var url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
-
+    
     var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
     .createInstance(Components.interfaces.nsIXMLHttpRequest);
     req.open("GET", url, true);
@@ -173,7 +163,7 @@ var itasanotifier = {
 	  var i;
 	  count++;
 	  dump("\nPrint #" + count +"\n");
-	  for(i=2; i<titles.length; i++){
+	  for(i=1; i<titles.length; i++){
 	    dump(titles[i].textContent + "\n");
 	  }
 	  dump("Print #" + count +"\n");
@@ -192,11 +182,18 @@ var itasanotifier = {
   },
 
   clearStatusBar: function(e){
+    // Mark all subs as read
     statusbar.label = itasaProp.GetStringFromName("itasanotifier.title");
     statusbar.tooltipText = latest20subs;
     var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
     itasaStatusPopupDownload.disabled = true;
     readSubs[0] = true;
+
+    var areRead = eval(pref.getBoolPref('areRead'));
+    // alert("clearStatusBar: " + areRead);
+    if (!areRead) pref.setBoolPref('areRead', true);
+    
+    pref.setCharPref('lastSub', lastSub.toSource());
   },
 
   amIInterested: function(e){
@@ -217,20 +214,17 @@ var itasanotifier = {
 	    dump("Match found: " + pref_savedseriesarray[n] + " matches " + titles[i].textContent + "\n");
 	    statusbar.tooltipText += titles[i].textContent + "\n";
 	    toDownload.push(pref_savedseriesarray[n]);
+	    
+	    // lastSub comparing avoid reshowing already read subs
+	    lastSub = titles[i].textContent;
 	  }
 	  else statusbar.tooltipText= "";
 	}
       }
     }
-
-    /*
-    for(n=0; n< toDownload.length; n++){
-      dump(toDownload[n] + "\n");
-    }
-    */
-  
+    
     latest20subs = "\n" + itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
-    for(i=2; i<titles.length; i++){
+    for(i=1; i<titles.length; i++){
       latest20subs += titles[i].textContent + "\n";
     }
 
@@ -238,22 +232,36 @@ var itasanotifier = {
       if(check){
 	var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
 	itasaStatusPopupDownload.disabled = false;
-	//getNamesNIds();
 	getList();
       }
     
+      // MANY SUBS
       if(check && matches>1){
-	statusbar.label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
+	var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
 	+ matches
-	+ " " + itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
+	+ " "
+	+ itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
 
-	statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + statusbar.tooltipText; // + latest20subs;
+	var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + statusbar.tooltipText;
+	
+	var compare = eval(pref.getCharPref("lastSub"));
+	if(tooltip.indexOf(compare) == -1){
+	  setStatusbar(label, tooltip);
+	}
+
       }
+      // JUST ONE SUB
       else if(check && matches==1){
-	statusbar.label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
-	statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") +
-	    "\n" + statusbar.tooltipText; // + "\n" + latest20subs;
+
+	var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
+	var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + "\n" + statusbar.tooltipText;
+	
+	var compare = eval(pref.getCharPref("lastSub"));
+	if(tooltip.indexOf(compare) == -1){
+	  setStatusbar(label, tooltip);
+	}
       }
+      // NO SUBS
       else {
 	getLatest20Subs();
 	statusbar.tooltipText = latest20subs;
@@ -334,7 +342,7 @@ function getLatest20Subs(){
 	 // Print titles list for the first time
 	 
 	 dump("\nManual Print" + "\n");
-	 for(i=2; i<titles.length; i++){
+	 for(i=1; i<titles.length; i++){
 	   dump(titles[i].textContent + "\n");
 	 }
 	 dump("Manual Print" + "\n");
@@ -342,7 +350,7 @@ function getLatest20Subs(){
 
 	 l20Subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
 
-	 for(i=2; i<titles.length; i++){
+	 for(i=1; i<titles.length; i++){
 	   l20Subs += titles[i].textContent + "\n";
 	 }
 	 latest20subs = l20Subs;
@@ -472,4 +480,11 @@ function addToolbarButton(buttonId) {
             return set.replace(/(urlbar-container|separator)/,
                                buttonId + ',$1');
     });
+}
+
+function setStatusbar(label, tooltip){
+
+  statusbar.label = label;
+  statusbar.tooltip = tooltip;
+  
 }
