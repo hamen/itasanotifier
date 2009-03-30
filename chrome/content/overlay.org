@@ -1,0 +1,45 @@
+Just some notes about code flow
+
+* itasanotifier.onLoad:
+** adds icon to toolbar on first install
+** loads seriesIWatch from preferences
+** readSubs[0] = false; (dunno wtf is)
+** calls getRSS();
+
+* itasanotifier.getRSS()
+** calls external getRSS function: fetchRSS (fix it pleez)
+
+* fetchRSS()
+** creates the event
+** creates the timer and calls the event which calls periodicallyFetch()
+
+* periodicallyFetch()
+** justGetRSS()
+*** executes XMLHTTPrequest
+*** gets XML RSS Feed and creates an array of TV Series Titles 
+    named seriesTitles (a global variable)
+** compares old seriesTitles with new seriesTitles.
+   if different{
+   prints new seriesTitles on console
+   checks if there are series I watch calling
+   "itasanotifier.amIInterested()"
+   }
+
+* itasanotifier.amIInterested()
+** get seriesIWatch from prefs
+** reset statusbar tooltip text to ""
+** fill an array with the latest 20 subs
+   (you already have this in global variable seriesTitles)
+** compares last 20 subs with preferred series and creates a matching series array
+** calls setTB_label_tooltip()
+
+* setTB_label_tooltip()
+** creates toolbar label and tooltip
+** calls checkList2Show()
+*** Create a purged list of series to show in tooltip
+    based on which series has been marked as already
+    read in a previous session
+** "if then else" to choose the right status/tooltiptext (unused readSubs[0])
+--- THE END ---
+
+
