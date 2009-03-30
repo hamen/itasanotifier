@@ -3,6 +3,25 @@
 #+STARTUP: hidestars
 #+SEQ_TODO: TODO DONE
 
+* TASKS
+** DONE Aggiungi l'icona nella toolbar alla prima installazione
+   "controllavo nell'onload dell'overlay principale se una data pref
+   era settata; se non era settata, significava prima installazione;
+   aggiungevo l'icona e settavo la pref"
+** Scelte le serie, ti mostra l'ultimo sub (anche se e' uscito 2 mesi fa)
+** Adatta nelle Prefs il bool che gestisce i "Mark as read" per utilizzarlo
+   per evitare la notifica dopo il riavvio o quando si aprono nuove finestre
+** Il link al file zip del sub ricavalo dal link al sub nell'RSS
+** Invece di aprire le finestre dei subs crea una pagina in chrome:// con le immagini dei sub da clickare
+** Se le lista delle serie personali e' vuota, non avviare gli le notifiche
+** TODO Salva nelle prefs un array con tutte le uscite di interesse
+  man mano che escono. Cerca di pensare a come risolvere il problema
+  del RSS che si aggiorna.
+  Scenario: per 5 giorni non avvi firefox. l'rss si aggiorna. passano
+  i subs che ti interessano :-/
+
+** TODO Fix del download delle serie: si aprono 50 tab
+
 * DOCS
 ** XMLHttpRequest per scaricare la pagina web. per i pattern, dipende da che
    intendi per pattern.scarica la pagina  con xmlhttprequest.poi prendi
@@ -13,3 +32,8 @@
 
 * FEATURE REQUEST
 ** "dovresti far uscire un menu con il collegamento al sub e dopo averlo visto il counter decresce da solo"
+** Dal dialog "Latest 20 Subs" possibilita' di scaricare i subs di una serie selezionata
+** "Mass add" di serie nella lista personale - Onizuka20 dal forum itasa
+** sarebbe possibile usare l'evento doubleclick per aggiungere o rimuovere una serie... - zefram cochrane dal forum
+* BUGS
+** Le url con i ":" vanno gestite meglio: es. Terminator: The Sarah....

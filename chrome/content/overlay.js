@@ -23,12 +23,14 @@ var timer;
 var pref_savedseriesarray;
 var titles;
 var statusbar;
-var latest20subs;
 var readSubs = [];
 var seriesNid = new Array();
 var toDownload = [];
 var seriesarray = [];
 var lastSub;
+var matchingSeries = [];
+var latest20subs;
+var seriesTitles = [];
 
 const url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
 const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
@@ -94,9 +96,11 @@ var itasanotifier = {
   },
 
   clearStatusBar: function(e){
-    // Mark all subs as read
+    // Reset statusbar label and tooltip text
     statusbar.label = itasaProp.GetStringFromName("itasanotifier.title");
+
     statusbar.tooltipText = latest20subs;
+
     var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
     itasaStatusPopupDownload.disabled = true;
     readSubs[0] = true;
@@ -105,84 +109,7 @@ var itasanotifier = {
     // alert("clearStatusBar: " + areRead);
     if (!areRead) pref.setBoolPref('areRead', true);
     
-    pref.setCharPref('lastSub', lastSub.toSource());
-  },
-
-  amIInterested: function(e){
-    pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
-    var check = false;
-    statusbar.tooltipText= "";
-
-    
-    var i, n, matches = 0;
-    for(n=0; n<pref_savedseriesarray.length; n++){
-      for(i=2; i<titles.length; i++){
-	if(titles[i].textContent.indexOf(pref_savedseriesarray[n]) != -1){
-
-	  check = true;
-	  matches++;
-	  if(readSubs[0] == false){
-	    readSubs[i] = titles[i].textContent;
-	    dump("Match found: " + pref_savedseriesarray[n] + " matches " + titles[i].textContent + "\n");
-	    statusbar.tooltipText += titles[i].textContent + "\n";
-	    toDownload.push(pref_savedseriesarray[n]);
-	    
-	    // lastSub comparing avoid reshowing already read subs
-	    lastSub = titles[i].textContent;
-	  }
-	  else statusbar.tooltipText= "";
-	}
-      }
-    }
-    
-    latest20subs = "\n" + itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
-    for(i=1; i<titles.length; i++){
-      latest20subs += titles[i].textContent + "\n";
-    }
-
-    if(readSubs[0] == false){
-      if(check){
-	var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
-	itasaStatusPopupDownload.disabled = false;
-	getList();
-      }
-    
-      // MANY SUBS
-      if(check && matches>1){
-	var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
-	+ matches
-	+ " "
-	+ itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
-
-	var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + statusbar.tooltipText;
-	
-	var compare = eval(pref.getCharPref("lastSub"));
-	if(tooltip.indexOf(compare) == -1){
-	  setStatusbar(label, tooltip);
-	}
-
-      }
-      // JUST ONE SUB
-      else if(check && matches==1){
-
-	var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
-	var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + "\n" + statusbar.tooltipText;
-	
-	var compare = eval(pref.getCharPref("lastSub"));
-	if(tooltip.indexOf(compare) == -1){
-	  setStatusbar(label, tooltip);
-	}
-      }
-      // NO SUBS
-      else {
-	getLatest20Subs();
-	statusbar.tooltipText = latest20subs;
-      }
-    }
-    else {
-      getLatest20Subs();
-      statusbar.tooltipText = latest20subs;
-    }
+    pref.setCharPref('lastSub', toDownload.toSource());
   },
 
   stopTimer: function(e){
@@ -199,7 +126,7 @@ var itasanotifier = {
     if(latest20subs) alert(latest20subs);
   },
 
-  downloadSubs: function(e){
+  downloadSubs: function(e) {
     var i, n, url;
     for(n=0; n<toDownload.length; n++){
       toDownload[n] = toDownload[n].replace(' ', "-", "gi");
@@ -223,22 +150,22 @@ var itasanotifier = {
 
 // ON LOAD
 window.addEventListener("load", function(e) {
+    // Array Remove - By John Resig (MIT Licensed)
+    Array.prototype.remove = function(from, to) {
+      var rest = this.slice((to || from) + 1 || this.length);
+      this.length = from < 0 ? this.length + from : from;
+      return this.push.apply(this, rest);
+    };
+    
+    // Load main object
     itasanotifier.onLoad(e);
 	
   }, false);
 
-
-function sayHello(msg){
-  alert("Message is: " + msg);
-}
-
 // Gets latest 20 subs released
 function getLatest20Subs(){
   var l20Subs;
-
-   // URL rss feed
-   //var url = "http://www.italiansubs.net/index2.php?option=com_rss";
-  
+     
    var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
      .createInstance(Components.interfaces.nsIXMLHttpRequest);
    req.open("GET", url, true);
@@ -272,60 +199,10 @@ function getLatest20Subs(){
      }  
    };  
    req.send(null);
+
 }
 
-// Gets an array of objects: series id, series name
-/*
-function getNamesNIds(){
-  //  var url = 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=27';
-  //  var url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
-
-  var req = new XMLHttpRequest();
-  req.overrideMimeType('text/xml');
-  req.open('GET', url, true); // 3rd argument, true, marks this as async 
-    
-   req.onreadystatechange = function (aEvt) {
-     if (req.readyState == 4) {
-      if(req.status == 200){
-	var seriesTXTList = req.responseText;
-	var re = new RegExp('("> ).+(</a>)', "g");
-
-	var matches_array = seriesTXTList.match(re);
-	  
-	var series = new Array();
-		
-	var i;
-	// Creates a new array of objects "series": seriesName, seriesId
-	
-	re = new RegExp('(&amp;id).+(</a>)', "g");
-	matches_array = seriesTXTList.match(re);
-	// matches_array if full of stuff like this: &amp;id=5"> 24</a></a>
-
-	for(i=2; i < matches_array.length; i++){
-	  var temp = matches_array[i].replace('&amp;id=', "", "gi"); // 5"> 24</a></a>
-	  matches_array[i] = temp;
-	  temp = matches_array[i].replace('</a>', "", "gi"); // 5"> 24
-	  matches_array[i] = temp;
-	  temp = matches_array[i].replace('">', "", "gi"); // 5 24
-	  matches_array[i] = temp;
-	  
-	  var seriesObj = {
-	  id: matches_array[i].substring(0, matches_array[i].indexOf(' ')),
-	  name: matches_array[i].substring(matches_array[i].indexOf(' ') , matches_array[i].length)
-	  };
-	  	  
-	  seriesNid[i] = seriesObj;
-	}
-      }
-      else
-	dump("Error loading page\n");
-    }
-   };
-  req.send(null); 
-}
-*/
 function getList(){
-
 
   var req = new XMLHttpRequest();
   req.overrideMimeType('text/xml');
@@ -394,9 +271,203 @@ function addToolbarButton(buttonId) {
     });
 }
 
-function setStatusbar(label, tooltip){
-
-  statusbar.label = label;
-  statusbar.tooltip = tooltip;
+function purgeList(list, i2r){
   
+  var i, index;
+  for(i=0; i < i2r.length; i++){
+      list.remove(i2r[i]-i);
+  }
+  return list;
+}
+
+// Create a purged list of series to show in tooltip
+// based on which series has been marked as already
+// read in a previous session
+function checkList2Show(series){
+  // Check to show or not notice
+  var previousSeries = eval(pref.getCharPref("lastSub"));
+  //alert("Series marked as read are: " + previousSeries +
+  //	"\nSeries to compare are: " + series +"\nSeries length is: " + series.length);
+
+  var i, n, index;
+  var tooltip = [];
+  var items2remove = [];
+    for(i=0; i < series.length; i++){
+      for(n=0; n < previousSeries.length; n++){
+	index = series[i].indexOf(previousSeries[n]);
+	
+	//alert("Comparing " + series[i] + "and " + previousSeries[n]);
+	
+	if(index != -1)
+	  {
+	    //alert(series[i] + " matches " + previousSeries[n]);
+	    // Series to be removed indexes
+	    items2remove.push(i);
+	  }
+      }
+    }
+    
+    // Purge series list
+    var ms = series;
+    var purgedMatchingSeries = purgeList(ms, items2remove);
+    //alert("Purged list: " + purgedMatchingSeries);
+    return purgedMatchingSeries;
+}
+
+function setTB_label_tooltip(l20s_a, check, matches, tt){
+
+  // Create toolbar label and tooltip
+  var latest20subs = "\n" + itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
+  for(i=0; i < l20s_a.length; i++){
+    latest20subs += l20s_a[i] + "\n";
+  }
+  
+  // CHECK tt
+  tt = checkList2Show(tt);
+
+  var i, tt2str = "";
+  for(i=0; i < tt.length; i++){
+    tt2str += tt[i] + "\n";
+  }
+
+  matches = tt.length;
+  //alert("tooltip is: " + tt2str +"\nmatches is: " + matches);
+
+  //  if(readSubs[0] == true){
+    if(check){
+      var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
+      itasaStatusPopupDownload.disabled = false;
+      getList();
+    }
+    
+    // MANY SUBS
+    if(check && matches > 1){
+      dump("\ncheck is true and matches > 1 \n");
+
+      // label looks like: There are N new subs
+      var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
+	+ matches
+	+ " "
+	+ itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
+
+      // tooltip look like: New subs: <series list>
+      var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + tt2str;
+
+      statusbar.label = label;
+      statusbar.tooltipText = tooltip;
+    }
+    // JUST ONE SUB
+    else if(check && matches==1){
+
+      var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
+      var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + "\n" + tt2str;
+
+      statusbar.label = label;
+      statusbar.tooltipText = tooltip;
+    }
+    // NO SUBS
+    else {
+      getLatest20Subs();
+      statusbar.tooltipText = latest20subs;
+    }
+    //  }
+  /*
+  else {
+    getLatest20Subs();
+    statusbar.tooltipText = latest20subs;
+  }
+  */
+}
+
+function fetchRSS(){
+  var count = 0;
+  var previousFirstElement;
+
+  // Event called periodically using the timer
+  var event = { 
+    periodicallyFetch(timer);
+  }
+
+  // Create the timer
+  timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
+  timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
+  
+}
+
+function periodicallyFetch(timer){
+
+  // download rss from url and save series titles in GLOBAL array seriesTitles
+  justGetRSS();
+
+  // compares old seriesTitles with new seriesTitles. if different{
+  // print new seriesTitles
+  // Check if there are series I watch: itasanotifier.amIInterested()}
+  
+  amIInterested();
+}
+
+function justGetRSS(){
+  var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+    .createInstance(Components.interfaces.nsIXMLHttpRequest);
+  req.open("GET", url, true);
+        
+  req.onreadystatechange = function (aEvt) {  
+    if (req.readyState == 4) {  
+      if(req.status == 200) {
+	// Gets XML RSS Feed and creates an array of TV Series Titles 
+	var xmldoc = req.responseXML;
+	seriesTitles = xmldoc.getElementsByTagName("title"); // seriesTitles is GLOBAL
+	alert("seriesTitles length is: " seriesTitles.length );
+      }
+      else  
+	dump("Error loading page\n");  
+    }  
+  };  
+  req.send(null);
+}
+
+
+function amIInterested(){
+  pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
+  var check = false;
+  statusbar.tooltipText= "";
+
+  var tooltip = [];
+  var i, n, matches = 0;
+  var latest20subs_array = [];
+    
+  // fills an array with the latest 20 subs
+  latest20subs_array = seriesTitles;
+  var readSubs = [];
+  readSubs[0] = false;
+    
+  //    alert(latest20subs_array.toSource());
+
+  // compares series you watch (saved in pref_savedseriesarray) against
+  // latest 20 subs (seriesTitles -> latest20subs_array)
+  // and creates matchingSeries array
+  for(n=0; n < pref_savedseriesarray.length; n++){
+    for(i=0; i < latest20subs_array.length; i++){
+      if(latest20subs_array[i].indexOf(pref_savedseriesarray[n]) != -1){
+	check = true;
+	matches++;
+	  
+	matchingSeries.push(latest20subs_array[i]);
+
+	if(readSubs[0] == false){
+	  readSubs[i] = latest20subs_array[i];
+	  dump("Match found: " + pref_savedseriesarray[n] + " matches " + latest20subs_array[i] + "\n");
+	  tooltip.push(latest20subs_array[i]);
+	  
+	  // (dunno wtf is)
+	  toDownload.push(pref_savedseriesarray[n]);
+	}
+	else statusbar.tooltipText= "";
+      }
+    }
+  }
+    
+  //dump("\n latest20subs_array is: " + latest20subs_array.toSource() + "\n\n");
+  //alert(tooltip.toSource());
+  setTB_label_tooltip(latest20subs_array, check, matches, tooltip );
 }
