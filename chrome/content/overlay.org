@@ -3,11 +3,7 @@ Just some notes about code flow
 * itasanotifier.onLoad:
 ** adds icon to toolbar on first install
 ** loads seriesIWatch from preferences
-** readSubs[0] = false; (dunno wtf is)
-** calls getRSS();
-
-* itasanotifier.getRSS()
-** calls external getRSS function: fetchRSS (fix it pleez)
+** calls fetchRSS
 
 * fetchRSS()
 ** creates the event

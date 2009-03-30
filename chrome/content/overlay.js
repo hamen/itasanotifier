@@ -64,22 +64,12 @@ var itasanotifier = {
     document.getElementById("contentAreaContextMenu")
             .addEventListener("popupshowing", function(e) { this.showContextMenu(e); }, false);
     
-    pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
     statusbar = document.getElementById('itasa-status-bar');
     
-    readSubs[0] = false;
-    //this.readSubs = readSubs;
-    // Print the list of series you watch 
-    /*
-    var i;
-    dump("Series you watch:\n");
-    for(i=0; i<pref_savedseriesarray.length; i++)
-      {
-	dump(pref_savedseriesarray[i] + "\n");	
-      }
-    */
-    //getLatest20Subs();
-    this.getRSS();
+    // loads seriesIWatch from preferences
+    pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
+        
+    fetchRSS();
   },
 
   showContextMenu: function(event) {
@@ -101,84 +91,6 @@ var itasanotifier = {
   },
   aboutItasaNotifier: function(e){
     window.openDialog("chrome://itasanotifier/content/about.xul");
-  },
-  
-  getRSS: function(e){
- 
-    var count = 0;
-    var previousFirstElement;
-  
-    // Event called periodically using the timer
-    var event = { notify: function(timer) {
-
-	req.open("GET", url, true);
-	req.onreadystatechange = function (aEvt) {  
-	  if (req.readyState == 4) {  
-	    if(req.status == 200) {
-	      var xmldoc = req.responseXML;
-	      var titles = xmldoc.getElementsByTagName("title");
-
-	      if(titles[2].textContent != previousFirstElement){
-		previousFirstElement = titles[2].textContent;
-	    
-		var i;
-		count++;
-		dump("\nPrint #" + count +"\n");
-		for(i=2; i<titles.length; i++){
-		  dump(titles[i].textContent + "\n");
-		}
-		dump("Print #" + count +"\n");
-
-		// Check if there are series I watch
-		itasanotifier.amIInterested();
-	      }
-	    }
-	    else  {
-	      this.stopTimer();
-	    }
-	  }  
-	};  
-	req.send(null);
-      }
-    }
-  
-    // Create the timer
-    timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
-    
-    var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-    .createInstance(Components.interfaces.nsIXMLHttpRequest);
-    req.open("GET", url, true);
-        
-    req.onreadystatechange = function (aEvt) {  
-      if (req.readyState == 4) {  
-	if(req.status == 200) {
-	  // Gets XML RSS Feed and creates an array of TV Series Titles 
-	  var xmldoc = req.responseXML;
-	  titles = xmldoc.getElementsByTagName("title");
-
-	  // Saves array first element to compare it after and avoid reprint the list
-	  previousFirstElement = titles[2].textContent;
-	 
-	  // Print titles list for the first time
-	  var i;
-	  count++;
-	  dump("\nPrint #" + count +"\n");
-	  for(i=1; i<titles.length; i++){
-	    dump(titles[i].textContent + "\n");
-	  }
-	  dump("Print #" + count +"\n");
-
-	  // Check if there are series I watch
-	  itasanotifier.amIInterested();
-	
-	  // If successed, init the timer (timer is in milliseconds, i.e. 10 minutes)
-	  timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
-	}
-	else  
-	  dump("Error loading page\n");  
-      }  
-    };  
-    req.send(null);
   },
 
   clearStatusBar: function(e){
