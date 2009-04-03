@@ -30,6 +30,7 @@ var seriesarray = [];
 var lastSub;
 var matchingSeries = [];
 var latest20subs;
+var latest20subsNlinks;
 
 const url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
 const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
@@ -103,12 +104,13 @@ var itasanotifier = {
     var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
     itasaStatusPopupDownload.disabled = true;
     readSubs[0] = true;
-
-    var areRead = eval(pref.getBoolPref('areRead'));
-    // alert("clearStatusBar: " + areRead);
-    if (!areRead) pref.setBoolPref('areRead', true);
     
-    pref.setCharPref('lastSub', toDownload.toSource());
+    // DUNNO WTF IS 
+    // var areRead = eval(pref.getBoolPref('areRead'));
+    // // alert("clearStatusBar: " + areRead);
+    // if (!areRead) pref.setBoolPref('areRead', true);
+    
+    // pref.setCharPref('lastSub', toDownload.toSource());
   },
 
   stopTimer: function(e){
@@ -118,33 +120,16 @@ var itasanotifier = {
     statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.updatesStopped");
   },
 
-
-
   showLatest20Subs: function(e){
     if(latest20subs) alert(latest20subs);
   },
 
   downloadSubs: function(e) {
-    var i, n, url;
-    for(n=0; n<toDownload.length; n++){
-      toDownload[n] = toDownload[n].replace(' ', "-", "gi");
-      toDownload[n] = toDownload[n].replace('\'', "-", "gi");
-      //      alert("toDownload: " + toDownload[n] + "and n is: " + n);
-      url = "http://www.italiansubs.net/Sottotitoli/" + toDownload[n];
-      window.open(url, null);
-
-      /*
-      for(i=2; i< seriesarray.length; i++){
-	if(seriesarray.indexOf(toDownload[n]) != -1){
-	  //url = "http://www.italiansubs.net/index.php?option=com_remository&Itemid=27&func=select&id=" + seriesNid[i].id;
-	
-	  //alert("url is: " + url);
-	  //window.open(url, null);
-	  }*/
-      }
-    }
-  //alert("fixing it");
-};
+    var i;
+    toDownload.forEach(function(item){
+	window.open(item.link, null);
+      });
+  }};
 
 // ON LOAD
 window.addEventListener("load", function(e) {
@@ -277,7 +262,7 @@ function setTB_label_tooltip(l20s_a, check, matches, tt){
   // Create toolbar label and tooltip
   var latest20subs = "\n" + itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
   for(i=0; i < l20s_a.length; i++){
-    latest20subs += l20s_a[i] + "\n";
+    latest20subs += l20s_a[i].title + "\n";
   }
   
   // CHECK tt
@@ -342,10 +327,10 @@ function fetchRSS(){
   var previousFirstElement;
 
   // First call after Firefox launch
-  getTitlesFrom(url, amIInterested, function(status) {
+  getDataFrom(url, amIInterested, function(status) {
       // report error
-     });
-  
+    }, "titles+links");
+
   // Event called periodically using the timer
   var event
     = { notify: function(timer){
@@ -358,49 +343,13 @@ function fetchRSS(){
 }
 
 function periodicallyFetch(timer){
-  getTitlesFrom(url, amIInterested, function(status) {
+  getDataFrom(url, amIInterested, function(status) {
       // report error
-     });
+    }, "titles+links");
 }
 
-function getTitlesFrom(url, onRetrieve, onError) {
-  // Gets XML RSS feed from url, parses it and creates an array
-  // of "titles" elements. Calls onRetrieve with seriesTitles
-  // array as param.
-    var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-      .createInstance(Components.interfaces.nsIXMLHttpRequest);
-    req.open("GET", url, true);
-    
-    req.onreadystatechange = function (aEvt) {
-      if (req.readyState == 4) {
-	if(req.status == 200){
-	  var titlesNodes = req.responseXML.getElementsByTagName("title");
-	  var i;
-	  var seriesTitles = [];
+function amIInterested(nodes){
 
-	  for(i=1; i< titlesNodes.length; i++){
-	    seriesTitles.push(titlesNodes[i].textContent);
-	  }
-
-	  var l20Subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
-	  for(i=1; i<titlesNodes.length; i++){
-	    l20Subs += titlesNodes[i].textContent + "\n";
-	  }
-	  latest20subs = l20Subs;
-	  
-	  onRetrieve(seriesTitles);
-	}
-	else
-	  onError(req.status);
-      }
-        else
-	  onError();
-    }
-    req.send(null);
-};
-
-function amIInterested(titles){
-  
   pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
   var check = false;
   statusbar.tooltipText= "";
@@ -416,25 +365,89 @@ function amIInterested(titles){
   // latest 20 subs (titles)
   // and creates matchingSeries array
   for(n=0; n < pref_savedseriesarray.length; n++){
-    for(i=0; i < titles.length; i++){
-      if(titles[i].indexOf(pref_savedseriesarray[n]) != -1){
+    for(i=0; i < nodes.length; i++){
+      if(nodes[i].title.indexOf(pref_savedseriesarray[n]) != -1){
 	check = true;
 	matches++;
 	  
-	matchingSeries.push(titles[i]);
+	matchingSeries.push(nodes[i].title);
 
 	if(readSubs[0] == false){
-	  readSubs[i] = titles[i];
-	  dump("Match found: " + pref_savedseriesarray[n] + " matches " + titles[i] + "\n");
-	  tooltip.push(titles[i]);
-	  
-	  // (dunno wtf is)
-	  toDownload.push(pref_savedseriesarray[n]);
+	  readSubs[i] = nodes[i].title;
+	  dump("Match found: " + pref_savedseriesarray[n] + " matches " + nodes[i].title + "\n");
+	  tooltip.push(nodes[i].title);
+	  toDownload.push(nodes[i]);
 	}
 	else statusbar.tooltipText= "";
       }
     }
   }
+
+  setTB_label_tooltip(nodes, check, matches, tooltip );
+}
+
+function getDataFrom(url, onRetrieve, onError, tag){
+    var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+      .createInstance(Components.interfaces.nsIXMLHttpRequest);
+    req.open("GET", url, true);
     
-  setTB_label_tooltip(titles, check, matches, tooltip );
+    req.onreadystatechange = function (aEvt) {
+      if (req.readyState == 4) {
+	if(req.status == 200){
+	  var i, n;
+	  var nodeList = [];
+	  var l20Subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
+	  
+	  switch(tag){
+	  case "titles":
+	  var nodes = req.responseXML.getElementsByTagName("title");
+	  for(i=1; i< nodes.length; i++){
+	    nodeList.push(nodes[i].textContent);
+	  }
+	  
+	  var l20Subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
+	  for(i=1; i < nodes.length; i++){
+	    l20Subs += nodes[i].textContent + "\n";
+	  }
+	  latest20subs = l20Subs;
+	  break;
+	  
+	  case "links":
+	  var nodes = req.responseXML.getElementsByTagName("link");
+	  for(i=1; i < nodes.length; i++){
+	    nodeList.push(nodes[i].textContent);
+	  }
+	  break;
+
+	  case "titles+links":
+	  var titles = req.responseXML.getElementsByTagName("title");
+	  var links = req.responseXML.getElementsByTagName("link");
+
+	  if(links.length == titles.length){
+	    for(i=1, n=0; i < titles.length; i++, n++){
+	     nodeList.push({
+	       title: titles[i].textContent,
+	       link: links[i].textContent});
+	     l20Subs += titles[i].textContent + "\n";
+	    }
+	
+	    latest20subs = l20Subs;
+	    latest20subsNlinks = nodeList;
+	  }
+	  else alert("lengths mismatch");
+	  break;
+
+	  default:
+	  var nodes = req.responseXML.getElementsByTagName("title");
+	  }
+
+	  onRetrieve(nodeList);
+	}
+	else
+	  onError(req.status);
+      }
+        else
+	  onError();
+    }
+    req.send(null);
 }
