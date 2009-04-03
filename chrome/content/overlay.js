@@ -382,21 +382,23 @@ function fetchRSS(){
   var count = 0;
   var previousFirstElement;
 
+  // First call after Firefox launch
+  getTitlesFrom(url, amIInterested, function(status) {
+      // report error
+     });
+  
   // Event called periodically using the timer
   var event
     = { notify: function(timer){
-      //      alert("fetchRSS called and event created. calling periodicallyFetch");
-      periodicallyFetch(timer); } }
+      periodicallyFetch(timer); 
+    } }
 
   // creates the timer
   timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
-  //  timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
-  // toy timer: 5 secs
-  timer.initWithCallback(event,5*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
+  timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
 }
 
 function periodicallyFetch(timer){
-  // download rss from url and save series titles in GLOBAL array seriesTitles
   getTitlesFrom(url, amIInterested, function(status) {
       // report error
      });
