@@ -30,7 +30,6 @@ var seriesarray = [];
 var lastSub;
 var matchingSeries = [];
 var latest20subs;
-var seriesTitles = [];
 
 const url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
 const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
@@ -70,7 +69,7 @@ var itasanotifier = {
     
     // loads seriesIWatch from preferences
     pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
-        
+    
     fetchRSS();
   },
 
@@ -384,50 +383,56 @@ function fetchRSS(){
   var previousFirstElement;
 
   // Event called periodically using the timer
-  var event = { 
-    periodicallyFetch(timer);
-  }
+  var event
+    = { notify: function(timer){
+      //      alert("fetchRSS called and event created. calling periodicallyFetch");
+      periodicallyFetch(timer); } }
 
-  // Create the timer
+  // creates the timer
   timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
-  timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
-  
+  //  timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
+  // toy timer: 5 secs
+  timer.initWithCallback(event,5*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
 }
 
 function periodicallyFetch(timer){
-
   // download rss from url and save series titles in GLOBAL array seriesTitles
-  justGetRSS();
-
-  // compares old seriesTitles with new seriesTitles. if different{
-  // print new seriesTitles
-  // Check if there are series I watch: itasanotifier.amIInterested()}
-  
-  amIInterested();
+  getTitlesFrom(url, amIInterested, function(status) {
+      // report error
+     });
 }
 
-function justGetRSS(){
-  var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-    .createInstance(Components.interfaces.nsIXMLHttpRequest);
-  req.open("GET", url, true);
-        
-  req.onreadystatechange = function (aEvt) {  
-    if (req.readyState == 4) {  
-      if(req.status == 200) {
-	// Gets XML RSS Feed and creates an array of TV Series Titles 
-	var xmldoc = req.responseXML;
-	seriesTitles = xmldoc.getElementsByTagName("title"); // seriesTitles is GLOBAL
-	alert("seriesTitles length is: " seriesTitles.length );
+function getTitlesFrom(url, onRetrieve, onError) {
+    var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+      .createInstance(Components.interfaces.nsIXMLHttpRequest);
+    req.open("GET", url, true);
+    
+    req.onreadystatechange = function (aEvt) {
+      if (req.readyState == 4) {
+	if(req.status == 200){
+	  // Gets XML RSS feed from url, parses it and creates an array
+	  // of "titles" elements. Calls onRetrieve with seriesTitles
+	  // array as param
+	  var titlesNodes = req.responseXML.getElementsByTagName("title");
+	  var i;
+	  var seriesTitles = [];
+
+	  for(i=1; i< titlesNodes.length; i++){
+	    seriesTitles.push(titlesNodes[i].textContent);
+	  }
+	  onRetrieve(seriesTitles);
+	}
+	else
+	  onError(req.status);
       }
-      else  
-	dump("Error loading page\n");  
-    }  
-  };  
-  req.send(null);
-}
+        else
+	  onError();
+    }
+    req.send(null);
+};
 
-
-function amIInterested(){
+function amIInterested(titles){
+  
   pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
   var check = false;
   statusbar.tooltipText= "";
@@ -435,29 +440,25 @@ function amIInterested(){
   var tooltip = [];
   var i, n, matches = 0;
   var latest20subs_array = [];
-    
-  // fills an array with the latest 20 subs
-  latest20subs_array = seriesTitles;
+
   var readSubs = [];
   readSubs[0] = false;
-    
-  //    alert(latest20subs_array.toSource());
-
+  
   // compares series you watch (saved in pref_savedseriesarray) against
-  // latest 20 subs (seriesTitles -> latest20subs_array)
+  // latest 20 subs (titles)
   // and creates matchingSeries array
   for(n=0; n < pref_savedseriesarray.length; n++){
-    for(i=0; i < latest20subs_array.length; i++){
-      if(latest20subs_array[i].indexOf(pref_savedseriesarray[n]) != -1){
+    for(i=0; i < titles.length; i++){
+      if(titles[i].indexOf(pref_savedseriesarray[n]) != -1){
 	check = true;
 	matches++;
 	  
-	matchingSeries.push(latest20subs_array[i]);
+	matchingSeries.push(titles[i]);
 
 	if(readSubs[0] == false){
-	  readSubs[i] = latest20subs_array[i];
-	  dump("Match found: " + pref_savedseriesarray[n] + " matches " + latest20subs_array[i] + "\n");
-	  tooltip.push(latest20subs_array[i]);
+	  readSubs[i] = titles[i];
+	  dump("Match found: " + pref_savedseriesarray[n] + " matches " + titles[i] + "\n");
+	  tooltip.push(titles[i]);
 	  
 	  // (dunno wtf is)
 	  toDownload.push(pref_savedseriesarray[n]);
@@ -467,7 +468,5 @@ function amIInterested(){
     }
   }
     
-  //dump("\n latest20subs_array is: " + latest20subs_array.toSource() + "\n\n");
-  //alert(tooltip.toSource());
-  setTB_label_tooltip(latest20subs_array, check, matches, tooltip );
+  setTB_label_tooltip(titles, check, matches, tooltip );
 }
