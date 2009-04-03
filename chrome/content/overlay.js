@@ -121,7 +121,6 @@ var itasanotifier = {
 
 
   showLatest20Subs: function(e){
-    getLatest20Subs();
     if(latest20subs) alert(latest20subs);
   },
 
@@ -160,53 +159,6 @@ window.addEventListener("load", function(e) {
     itasanotifier.onLoad(e);
 	
   }, false);
-
-// Gets latest 20 subs released
-function getLatest20Subs(){
-  var l20Subs;
-
-  // FETCHES RSS WITH xmlhttprequest
-  // parses responseXML
-  // creates seriesTitles array 
-  // Prints a titles list to console
-  // creates a string with 'itasanotifier.statusbar.latest20subs' property and seriesTitles
-  // set l20Subs (GLOBAL var) to previous string
-  
-   // var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-   //   .createInstance(Components.interfaces.nsIXMLHttpRequest);
-   // req.open("GET", url, true);
-
-   // req.onreadystatechange = function (aEvt) {  
-   //   if (req.readyState == 4) {  
-   //     if(req.status == 200) {
-   // 	 // Gets XML RSS Feed and creates an array of TV Series Titles 
-   // 	 var xmldoc = req.responseXML;
-   // 	 titles = xmldoc.getElementsByTagName("title");
-   // 	 var i;
-
-   // 	 // Print titles list for the first time
-	 
-   // 	 dump("\nManual Print" + "\n");
-   // 	 for(i=1; i<titles.length; i++){
-   // 	   dump(titles[i].textContent + "\n");
-   // 	 }
-   // 	 dump("Manual Print" + "\n");
-	 
-
-   // 	 l20Subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
-
-   // 	 for(i=1; i<titles.length; i++){
-   // 	   l20Subs += titles[i].textContent + "\n";
-   // 	 }
-   // 	 latest20subs = l20Subs;
-   //     }
-   //     else  
-   // 	 dump("Error loading page\n Req status:" + req.status + "and url: " + url);  
-   //   }  
-   // };  
-   // req.send(null);
-
-}
 
 function getList(){
 
@@ -412,6 +364,9 @@ function periodicallyFetch(timer){
 }
 
 function getTitlesFrom(url, onRetrieve, onError) {
+  // Gets XML RSS feed from url, parses it and creates an array
+  // of "titles" elements. Calls onRetrieve with seriesTitles
+  // array as param.
     var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
       .createInstance(Components.interfaces.nsIXMLHttpRequest);
     req.open("GET", url, true);
@@ -419,9 +374,6 @@ function getTitlesFrom(url, onRetrieve, onError) {
     req.onreadystatechange = function (aEvt) {
       if (req.readyState == 4) {
 	if(req.status == 200){
-	  // Gets XML RSS feed from url, parses it and creates an array
-	  // of "titles" elements. Calls onRetrieve with seriesTitles
-	  // array as param
 	  var titlesNodes = req.responseXML.getElementsByTagName("title");
 	  var i;
 	  var seriesTitles = [];
@@ -429,6 +381,13 @@ function getTitlesFrom(url, onRetrieve, onError) {
 	  for(i=1; i< titlesNodes.length; i++){
 	    seriesTitles.push(titlesNodes[i].textContent);
 	  }
+
+	  var l20Subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
+	  for(i=1; i<titlesNodes.length; i++){
+	    l20Subs += titlesNodes[i].textContent + "\n";
+	  }
+	  latest20subs = l20Subs;
+	  
 	  onRetrieve(seriesTitles);
 	}
 	else
