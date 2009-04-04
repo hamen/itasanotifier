@@ -27,10 +27,10 @@ var readSubs = [];
 var seriesNid = new Array();
 var toDownload = [];
 var seriesarray = [];
-var lastSub;
 var matchingSeries = [];
 var latest20subs;
 var latest20subsNlinks;
+var alreadyDownloaded = [];
 
 const url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
 const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
@@ -68,7 +68,6 @@ var itasanotifier = {
     
     statusbar = document.getElementById('itasa-status-bar');
     
-    // loads seriesIWatch from preferences
     pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
     
     fetchRSS();
@@ -105,12 +104,8 @@ var itasanotifier = {
     itasaStatusPopupDownload.disabled = true;
     readSubs[0] = true;
     
-    // DUNNO WTF IS 
-    // var areRead = eval(pref.getBoolPref('areRead'));
-    // // alert("clearStatusBar: " + areRead);
-    // if (!areRead) pref.setBoolPref('areRead', true);
-    
-    // pref.setCharPref('lastSub', toDownload.toSource());
+    pref.setCharPref('alreadyDownloaded', toDownload.toSource());
+    alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
   },
 
   stopTimer: function(e){
@@ -214,63 +209,45 @@ function addToolbarButton(buttonId) {
     });
 }
 
-function purgeList(list, i2r){
-  
-  var i, index;
-  for(i=0; i < i2r.length; i++){
-      list.remove(i2r[i]-i);
-  }
-  return list;
-}
-
 // Create a purged list of series to show in tooltip
 // based on which series has been marked as already
 // read in a previous session
-function checkList2Show(series){
-  // Check to show or not notice
-  var previousSeries = eval(pref.getCharPref("lastSub"));
-  //alert("Series marked as read are: " + previousSeries +
-  //	"\nSeries to compare are: " + series +"\nSeries length is: " + series.length);
+function purgeList(currentSeries){
 
-  var i, n, index;
-  var tooltip = [];
-  var items2remove = [];
-    for(i=0; i < series.length; i++){
-      for(n=0; n < previousSeries.length; n++){
-	index = series[i].indexOf(previousSeries[n]);
-	
-	//alert("Comparing " + series[i] + "and " + previousSeries[n]);
-	
-	if(index != -1)
-	  {
-	    //alert(series[i] + " matches " + previousSeries[n]);
-	    // Series to be removed indexes
-	    items2remove.push(i);
-	  }
-      }
+  alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
+
+  var i, n;
+  for (i = 0; i < alreadyDownloaded.length; i++){
+    for (n = 0; n < currentSeries.length; n++){
+      
+      if(currentSeries[n].title.indexOf(alreadyDownloaded[i].title))
+	 currentSeries[n].title == "alreadyDownloaded";
     }
-    
-    // Purge series list
-    var ms = series;
-    var purgedMatchingSeries = purgeList(ms, items2remove);
-    //alert("Purged list: " + purgedMatchingSeries);
-    return purgedMatchingSeries;
+  }
+  
+  var newSeries = [];
+  currentSeries.forEach(function(item){
+      if(item.title != "alreadyDownloaded") newSeries.push(item);
+    });
+  
+  pref.setCharPref('alreadyDownloaded', newSeries.toSource());    
+  return newSeries;
 }
 
 function setTB_label_tooltip(l20s_a, check, matches, tt){
-
   // Create toolbar label and tooltip
   var latest20subs = "\n" + itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
   for(i=0; i < l20s_a.length; i++){
     latest20subs += l20s_a[i].title + "\n";
   }
   
+  // CHECK THIS FUNCTION
   // CHECK tt
-  tt = checkList2Show(tt);
+  tt = purgeList(tt);
 
   var i, tt2str = "";
   for(i=0; i < tt.length; i++){
-    tt2str += tt[i] + "\n";
+    tt2str += tt[i].title + "\n";
   }
 
   matches = tt.length;
@@ -375,14 +352,13 @@ function amIInterested(nodes){
 	if(readSubs[0] == false){
 	  readSubs[i] = nodes[i].title;
 	  dump("Match found: " + pref_savedseriesarray[n] + " matches " + nodes[i].title + "\n");
-	  tooltip.push(nodes[i].title);
+	  tooltip.push(nodes[i]);
 	  toDownload.push(nodes[i]);
 	}
 	else statusbar.tooltipText= "";
       }
     }
   }
-
   setTB_label_tooltip(nodes, check, matches, tooltip );
 }
 
