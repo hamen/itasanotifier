@@ -53,6 +53,7 @@ const itasaProp = Components.classes["@mozilla.org/intl/stringbundle;1"]
 var itasanotifier = {
   onLoad: function() {
     // Add icon to toolbar on first install
+    // Should be replaced with new function suggested by bard
     var firstInstall = eval(pref.getBoolPref('firstInstall'));
     if (firstInstall) {
       var toolbar = document.getElementById('nav-bar');
@@ -144,14 +145,12 @@ function getList(){
 
   var req = new XMLHttpRequest();
   req.overrideMimeType('text/xml');
-  req.open('GET', urlSubs, true); /* 3rd argument, true, marks this as async */
-    
-  // defines a function on the fly (called "anonymous function")
+  req.open('GET', urlSubs, true);
+
   req.onreadystatechange = function (aEvt) {
      if (req.readyState == 4) {
       if(req.status == 200){
 	//Print series page as html
-	//dump(req.responseText);
 	// I know this method sucks, but XML sent from server is wrong and XML parser fails
 	var seriesTXTList = req.responseText;
 	var re = new RegExp('("> ).+(</a>)', "g");
@@ -167,7 +166,6 @@ function getList(){
 	  temp = matches_array[i].replace('</a>', "", "gi");
 	  series[i]= temp;
 	  seriesarray[i] = temp;
-	  //dump(seriesarray[i] + "\n");
 	}
       }
       else
@@ -251,52 +249,42 @@ function setTB_label_tooltip(l20s_a, check, matches, tt){
   }
 
   matches = tt.length;
-  //alert("tooltip is: " + tt2str +"\nmatches is: " + matches);
-
-  //  if(readSubs[0] == true){
-    if(check){
-      var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
-      itasaStatusPopupDownload.disabled = false;
-      getList();
-    }
+  if(check){
+    var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
+    itasaStatusPopupDownload.disabled = false;
+    getList();
+  }
     
-    // MANY SUBS
-    if(check && matches > 1){
-      dump("\ncheck is true and matches > 1 \n");
+  // MANY SUBS
+  if(check && matches > 1){
+    dump("\ncheck is true and matches > 1 \n");
 
-      // label looks like: There are N new subs
-      var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
-	+ matches
-	+ " "
-	+ itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
+    // label looks like: There are N new subs
+    var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
+      + matches
+      + " "
+      + itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
 
-      // tooltip look like: New subs: <series list>
-      var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + tt2str;
+    // tooltip look like: New subs: <series list>
+    var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + tt2str;
 
-      statusbar.label = label;
-      statusbar.tooltipText = tooltip;
-    }
-    // JUST ONE SUB
-    else if(check && matches==1){
+    statusbar.label = label;
+    statusbar.tooltipText = tooltip;
+  }
+  // JUST ONE SUB
+  else if(check && matches==1){
 
-      var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
-      var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + "\n" + tt2str;
+    var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
+    var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + "\n" + tt2str;
 
-      statusbar.label = label;
-      statusbar.tooltipText = tooltip;
-    }
-    // NO SUBS
-    else {
-      getLatest20Subs();
-      statusbar.tooltipText = latest20subs;
-    }
-    //  }
-  /*
+    statusbar.label = label;
+    statusbar.tooltipText = tooltip;
+  }
+  // NO SUBS
   else {
     getLatest20Subs();
     statusbar.tooltipText = latest20subs;
   }
-  */
 }
 
 function fetchRSS(){
