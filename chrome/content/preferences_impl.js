@@ -29,7 +29,7 @@ const prefs = Cc['@mozilla.org/preferences-service;1']
   .getService(Ci.nsIPrefService)
   .getBranch('extensions.itasanotifier.');
 
-const url = "http://www.italiansubs.net/Sottotitoli/";
+const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
 
 var seriesarray = new Array();
 var unsavedSeriesArray = new Array();
@@ -53,13 +53,10 @@ function init() {
 
 function getList(){
   
-  //var url = 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=27';
-  //var url = 'http://www.ing.unisannio.it/';
   var req = new XMLHttpRequest();
   req.overrideMimeType('text/xml');
-  req.open('GET', url, true); /* 3rd argument, true, marks this as async */
-    
-  // defines a function on the fly (called "anonymous function")
+  req.open('GET', urlSubs, true);
+
   req.onreadystatechange = function (aEvt) {
      if (req.readyState == 4) {
       if(req.status == 200){
@@ -107,6 +104,7 @@ function addToMyList(){
   
   var itemIndex = thelist.selectedIndex;
   var item = thelist.getItemAtIndex(itemIndex);
+  if(item.label === undefined) alert("item.label is undefined");
   myserieslist.appendItem(item.label);
   
   listHasChanged = document.getElementById('listHasChanged');
@@ -142,30 +140,30 @@ function saveMyList(){
   listHasChanged.hidden = true;
 }
 
-// Download XML RSS Feed
-function getRSS(){
-  var req = new XMLHttpRequest();
-  var url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
-  req.open('GET', url, true);
-  req.onreadystatechange = function (aEvt) {
-    if (req.readyState == 4) {
-      if(req.status == 200){
-	//	dump(req.responseText);
-	var xmldoc = req.responseXML;
-	var titles = xmldoc.getElementsByTagName("title");
+// // Download XML RSS Feed
+// function getRSS(){
+//   var req = new XMLHttpRequest();
+//   var url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
+//   req.open('GET', url, true);
+//   req.onreadystatechange = function (aEvt) {
+//     if (req.readyState == 4) {
+//       if(req.status == 200){
+// 	//	dump(req.responseText);
+// 	var xmldoc = req.responseXML;
+// 	var titles = xmldoc.getElementsByTagName("title");
 	
-	var i;
-	for(i=2; i<titles.length; i++){
-	  alert(titles[i].textContent);
-	}
+// 	var i;
+// 	for(i=2; i<titles.length; i++){
+// 	  alert(titles[i].textContent);
+// 	}
 
-      }
-      else
-	dump("Error loading page\n");
-    }
-  };
-  req.send(null);
-}
+//       }
+//       else
+// 	dump("Error loading page\n");
+//     }
+//   };
+//   req.send(null);
+// }
 
 function printElt(element, index, array) {
     print("[" + index + "] is " + element); // assumes print is already defined
@@ -173,10 +171,9 @@ function printElt(element, index, array) {
 
 
 function getNamesNIds(){
-  //var url = 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=27';
   var req = new XMLHttpRequest();
   req.overrideMimeType('text/xml');
-  req.open('GET', url, true); /* 3rd argument, true, marks this as async */
+  req.open('GET', urlSubs, true); /* 3rd argument, true, marks this as async */
     
    req.onreadystatechange = function (aEvt) {
      if (req.readyState == 4) {

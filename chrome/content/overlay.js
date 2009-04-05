@@ -211,8 +211,9 @@ function addToolbarButton(buttonId) {
 // based on which series has been marked as already
 // read in a previous session
 function purgeList(currentSeries){
-
+  var newSeries = [];
   alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
+  if (alreadyDownloaded == "" || alreadyDownloaded == undefined) return currentSeries;
 
   var i, n;
   for (i = 0; i < alreadyDownloaded.length; i++){
@@ -222,8 +223,7 @@ function purgeList(currentSeries){
 	 currentSeries[n].title == "alreadyDownloaded";
     }
   }
-  
-  var newSeries = [];
+
   currentSeries.forEach(function(item){
       if(item.title != "alreadyDownloaded") newSeries.push(item);
     });
@@ -257,8 +257,6 @@ function setTB_label_tooltip(l20s_a, check, matches, tt){
     
   // MANY SUBS
   if(check && matches > 1){
-    dump("\ncheck is true and matches > 1 \n");
-
     // label looks like: There are N new subs
     var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
       + matches
@@ -282,7 +280,6 @@ function setTB_label_tooltip(l20s_a, check, matches, tt){
   }
   // NO SUBS
   else {
-    getLatest20Subs();
     statusbar.tooltipText = latest20subs;
   }
 }
@@ -315,6 +312,8 @@ function periodicallyFetch(timer){
 
 function amIInterested(nodes){
 
+  //  nodes.forEach(function(item){dump(item.toSource());});
+
   pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
   var check = false;
   statusbar.tooltipText= "";
@@ -334,20 +333,14 @@ function amIInterested(nodes){
       if(nodes[i].title.indexOf(pref_savedseriesarray[n]) != -1){
 	check = true;
 	matches++;
-	  
-	matchingSeries.push(nodes[i].title);
-
-	if(readSubs[0] == false){
-	  readSubs[i] = nodes[i].title;
-	  dump("Match found: " + pref_savedseriesarray[n] + " matches " + nodes[i].title + "\n");
-	  tooltip.push(nodes[i]);
-	  toDownload.push(nodes[i]);
-	}
-	else statusbar.tooltipText= "";
+	matchingSeries.push(nodes[i]);
+	dump("Match found: " + pref_savedseriesarray[n] + " matches " + nodes[i].title + "\n");
+	tooltip.push(nodes[i]);
+	toDownload.push(nodes[i]);
       }
     }
   }
-  setTB_label_tooltip(nodes, check, matches, tooltip );
+  setTB_label_tooltip(matchingSeries, check, matches, tooltip );
 }
 
 function getDataFrom(url, onRetrieve, onError, tag){
