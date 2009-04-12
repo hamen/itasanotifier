@@ -2,20 +2,20 @@
 <RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
          xmlns:NC="http://home.netscape.com/NC-rdf#"
          xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Description RDF:about="rdf:#$cCQcB"
+                   em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                   em:minVersion="3.0"
+                   em:maxVersion="3.0.*" />
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="itasanotifier@hamen.org"
                    em:name="Itasa Notifier"
-                   em:version="20090309"
+                   em:version="2009040522"
                    em:creator="Ivan Morgillo"
                    em:description="Get notified about ItalianSubs.net releases"
                    em:homepageURL="http://itasanotifier.hamen.org"
                    em:iconURL="chrome://itasanotifier/skin/icon.png"
                    em:optionsURL="chrome://itasanotifier/content/preferences.xul"
                    em:aboutURL="chrome://itasanotifier/content/about.xul">
-    <em:targetApplication RDF:resource="rdf:#$IBzwf2"/>
+    <em:targetApplication RDF:resource="rdf:#$cCQcB"/>
   </RDF:Description>
-  <RDF:Description RDF:about="rdf:#$IBzwf2"
-                   em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
-                   em:minVersion="3.0"
-                   em:maxVersion="3.0.*" />
 </RDF:RDF>

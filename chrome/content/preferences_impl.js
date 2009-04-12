@@ -130,6 +130,7 @@ function saveMyList(){
 
   var i;
   for(i=0; i < length; i++){
+    if(myserieslist.getItemAtIndex(i).label === undefined) alert("myserieslist.getItemAtIndex(i).label is undefined");
     unsavedSeriesArray[i] = myserieslist.getItemAtIndex(i).label;
   }
   unsavedSeriesArray.sort();
@@ -139,31 +140,6 @@ function saveMyList(){
   listHasChanged = document.getElementById('listHasChanged');
   listHasChanged.hidden = true;
 }
-
-// // Download XML RSS Feed
-// function getRSS(){
-//   var req = new XMLHttpRequest();
-//   var url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
-//   req.open('GET', url, true);
-//   req.onreadystatechange = function (aEvt) {
-//     if (req.readyState == 4) {
-//       if(req.status == 200){
-// 	//	dump(req.responseText);
-// 	var xmldoc = req.responseXML;
-// 	var titles = xmldoc.getElementsByTagName("title");
-	
-// 	var i;
-// 	for(i=2; i<titles.length; i++){
-// 	  alert(titles[i].textContent);
-// 	}
-
-//       }
-//       else
-// 	dump("Error loading page\n");
-//     }
-//   };
-//   req.send(null);
-// }
 
 function printElt(element, index, array) {
     print("[" + index + "] is " + element); // assumes print is already defined

@@ -1,5 +1,7 @@
 *~
 *.xpi
-*.rdf
+install.rdf
+update.rdf
 *.org
 xpi.sh
+.#*
