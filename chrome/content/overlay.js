@@ -31,6 +31,8 @@ var matchingSeries = [];
 var latest20subs;
 var latest20subsNlinks;
 var alreadyDownloaded = [];
+var winAlreadyOpen;
+var lastPopupLink;
 
 const url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
 const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
@@ -47,6 +49,10 @@ const pref = Components
 const itasaProp = Components.classes["@mozilla.org/intl/stringbundle;1"]
   .getService(Components.interfaces.nsIStringBundleService)
   .createBundle("chrome://itasanotifier/locale/itasanotifier.properties");
+
+const alertsService = Components.classes["@mozilla.org/alerts-service;1"]
+                              .getService(Components.interfaces.nsIAlertsService);
+
 // ----------------------------------------------------------------------
 
 
@@ -123,9 +129,17 @@ var itasanotifier = {
   downloadSubs: function(e) {
     var i;
     toDownload.forEach(function(item){
-	window.open(item.link, null);
-      });
-  }};
+	// FIND A WAY TO MANAGE OPEN WINDOWS: if it's already open, do not open it again!
+	//window.open(item.link, item.title, "width=800,height=600,scrollbars=no,menubar=no");
+	
+	// Subs windows open in a new tab instead of a new windows
+	gBrowser.addTab(item.link);
+	gBrowser.selectedTab = gBrowser.newTab;
+    });
+    this.clearStatusBar();
+  }
+
+};
 
 // ON LOAD
 window.addEventListener("load", function(e) {
@@ -211,9 +225,13 @@ function addToolbarButton(buttonId) {
 // based on which series has been marked as already
 // read in a previous session
 function purgeList(currentSeries){
-  var newSeries = [];
   alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
-  if (alreadyDownloaded == "" || alreadyDownloaded == undefined) return currentSeries;
+  
+  var newSeries = [];
+  if (alreadyDownloaded === "" || alreadyDownloaded === undefined) return currentSeries;
+  else if (alreadyDownloaded.toSource() === currentSeries.toSource()) {
+    return newSeries;
+  }
 
   var i, n;
   for (i = 0; i < alreadyDownloaded.length; i++){
@@ -340,6 +358,28 @@ function amIInterested(nodes){
       }
     }
   }
+  
+  var listener = {
+  observe: function(subject, topic, data) {
+      if(topic === "alertclickcallback"){
+	//var win = window.open(data, "Last sub", "width=800,height=600,scrollbars=no,menubar=no" );
+	gBrowser.addTab(data);
+	gBrowser.selectedTab = gBrowser.newTab;
+	itasanotifier.clearStatusBar();
+      }
+      else if (topic === "alertfinished") lastPopupLink = data;
+    }
+  }
+  
+  if (toDownload && toDownload[toDownload.length - 1].link !== lastPopupLink){
+    
+    var lastTitle = toDownload[toDownload.length - 1].title;
+    var lastLink = toDownload[toDownload.length - 1].link; 
+    alertsService.showAlertNotification("chrome://mozapps/skin/downloads/downloadIcon.png", 
+					itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub"), lastTitle, true, lastLink , listener);
+    lastPopupLink = toDownload[toDownload.length - 1].link;
+  }
+
   setTB_label_tooltip(matchingSeries, check, matches, tooltip );
 }
 
