@@ -128,17 +128,12 @@ var itasanotifier = {
 
   downloadSubs: function(e) {
     var i;
-    toDownload.forEach(function(item){
-	// FIND A WAY TO MANAGE OPEN WINDOWS: if it's already open, do not open it again!
-	//window.open(item.link, item.title, "width=800,height=600,scrollbars=no,menubar=no");
-	
-	// Subs windows open in a new tab instead of a new windows
-	gBrowser.addTab(item.link);
-	gBrowser.selectedTab = gBrowser.newTab;
-    });
+    for(i=0; i < toDownload.length; i++){
+      gBrowser.addTab(toDownload[i].link);
+      gBrowser.selectedTab = gBrowser.newTab;
+      }
     this.clearStatusBar();
   }
-
 };
 
 // ON LOAD
