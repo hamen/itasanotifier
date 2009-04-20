@@ -33,6 +33,7 @@ var latest20subsNlinks;
 var alreadyDownloaded = [];
 var winAlreadyOpen;
 var lastPopupLink;
+var showPopup;
 
 const url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
 const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
@@ -77,6 +78,9 @@ var itasanotifier = {
     
     pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
     
+    var alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
+    if(alreadyDownloaded === undefined) showPopup = true;
+    
     fetchRSS();
   },
 
@@ -113,6 +117,7 @@ var itasanotifier = {
     
     pref.setCharPref('alreadyDownloaded', toDownload.toSource());
     alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
+    showPopup = false;
   },
 
   stopTimer: function(e){
@@ -138,7 +143,7 @@ var itasanotifier = {
 
 // ON LOAD
 window.addEventListener("load", function(e) {
-    // Array Remove - By John Resig (MIT Licensed)
+    // Array Remove - By John Resig 
     Array.prototype.remove = function(from, to) {
       var rest = this.slice((to || from) + 1 || this.length);
       this.length = from < 0 ? this.length + from : from;
@@ -293,7 +298,7 @@ function setTB_label_tooltip(l20s_a, check, matches, tt){
   }
   // NO SUBS
   else {
-    statusbar.tooltipText = latest20subs;
+    statusbar.tooltipText = "";
   }
 }
 
@@ -366,7 +371,7 @@ function amIInterested(nodes){
     }
   }
   
-  if (toDownload && toDownload[toDownload.length - 1].link !== lastPopupLink){
+  if (showPopup === true && toDownload.length != "0" && toDownload[toDownload.length - 1].link !== lastPopupLink){
     
     var lastTitle = toDownload[toDownload.length - 1].title;
     var lastLink = toDownload[toDownload.length - 1].link; 
