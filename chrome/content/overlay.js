@@ -343,6 +343,8 @@ function amIInterested(nodes){
   var readSubs = [];
   readSubs[0] = false;
   
+  toDownload = [];
+
   // compares series you watch (saved in pref_savedseriesarray) against
   // latest 20 subs (titles)
   // and creates matchingSeries array
