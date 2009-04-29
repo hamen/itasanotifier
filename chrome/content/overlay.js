@@ -319,7 +319,7 @@ function fetchRSS(){
 
   // creates the timer
   timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
-  timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
+  timer.initWithCallback(event,1*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
 }
 
 function periodicallyFetch(timer){
@@ -343,6 +343,8 @@ function amIInterested(nodes){
   var readSubs = [];
   readSubs[0] = false;
   
+  toDownload = [];
+
   // compares series you watch (saved in pref_savedseriesarray) against
   // latest 20 subs (titles)
   // and creates matchingSeries array
