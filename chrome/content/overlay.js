@@ -143,13 +143,6 @@ var itasanotifier = {
 
 // ON LOAD
 window.addEventListener("load", function(e) {
-    // Array Remove - By John Resig 
-    Array.prototype.remove = function(from, to) {
-      var rest = this.slice((to || from) + 1 || this.length);
-      this.length = from < 0 ? this.length + from : from;
-      return this.push.apply(this, rest);
-    };
-    
     // Load main object
     itasanotifier.onLoad(e);
 	
@@ -226,27 +219,36 @@ function addToolbarButton(buttonId) {
 // read in a previous session
 function purgeList(currentSeries){
   alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
-  
+
   var newSeries = [];
-  if (alreadyDownloaded === "" || alreadyDownloaded === undefined) return currentSeries;
+  if (alreadyDownloaded === "[]" || alreadyDownloaded === undefined){
+    //alert("alreadyDownloaded is undefined" + "\n" + "currentSeries is:" + currentSeries.toSource());
+    return currentSeries;
+  }
   else if (alreadyDownloaded.toSource() === currentSeries.toSource()) {
+    //alert("arrays match");
     return newSeries;
   }
-
-  var i, n;
-  for (i = 0; i < alreadyDownloaded.length; i++){
-    for (n = 0; n < currentSeries.length; n++){
-      
-      if(currentSeries[n].title.indexOf(alreadyDownloaded[i].title))
-	 currentSeries[n].title == "alreadyDownloaded";
+  else {
+    //alert("alreadyDownloaded is:\n" + alreadyDownloaded.toSource() + "\n" + "currentSeries is:\n" + currentSeries.toSource());
+    
+    var i, n, matches = 0;
+    for (i = 0; i < currentSeries.length; matches = 0, i++){
+      for (n = 0; n < alreadyDownloaded.length; n++){
+	var currentTitle = currentSeries[i].title;
+	var oldTitle = alreadyDownloaded[n].title;
+	
+	if (currentTitle === oldTitle){
+	  //alert(currentTitle + "\n" + oldTitle);	  
+	  matches++;
+	}
+	//alert("matches is: " + matches);
+      }
+      if (matches === 0)
+	newSeries.push(currentSeries[i]);
     }
+    //alert(newSeries.toSource());
   }
-
-  currentSeries.forEach(function(item){
-      if(item.title != "alreadyDownloaded") newSeries.push(item);
-    });
-  
-  pref.setCharPref('alreadyDownloaded', newSeries.toSource());    
   return newSeries;
 }
 
@@ -273,33 +275,7 @@ function setTB_label_tooltip(l20s_a, check, matches, tt){
     getList();
   }
     
-  // MANY SUBS
-  if(check && matches > 1){
-    // label looks like: There are N new subs
-    var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
-      + matches
-      + " "
-      + itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
-
-    // tooltip look like: New subs: <series list>
-    var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + tt2str;
-
-    statusbar.label = label;
-    statusbar.tooltipText = tooltip;
-  }
-  // JUST ONE SUB
-  else if(check && matches==1){
-
-    var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
-    var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + "\n" + tt2str;
-
-    statusbar.label = label;
-    statusbar.tooltipText = tooltip;
-  }
-  // NO SUBS
-  else {
-    statusbar.tooltipText = "";
-  }
+  setLabelNTooltip(check, matches, tt, tt2str);
 }
 
 function fetchRSS(){
@@ -360,28 +336,7 @@ function amIInterested(nodes){
       }
     }
   }
-  
-  var listener = {
-  observe: function(subject, topic, data) {
-      if(topic === "alertclickcallback"){
-	//var win = window.open(data, "Last sub", "width=800,height=600,scrollbars=no,menubar=no" );
-	gBrowser.addTab(data);
-	gBrowser.selectedTab = gBrowser.newTab;
-	itasanotifier.clearStatusBar();
-      }
-      else if (topic === "alertfinished") lastPopupLink = data;
-    }
-  }
-  
-  if (showPopup === true && toDownload.length != "0" && toDownload[toDownload.length - 1].link !== lastPopupLink){
-    
-    var lastTitle = toDownload[toDownload.length - 1].title;
-    var lastLink = toDownload[toDownload.length - 1].link; 
-    alertsService.showAlertNotification("chrome://mozapps/skin/downloads/downloadIcon.png", 
-					itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub"), lastTitle, true, lastLink , listener);
-    lastPopupLink = toDownload[toDownload.length - 1].link;
-  }
-
+ 
   setTB_label_tooltip(matchingSeries, check, matches, tooltip );
 }
 
@@ -451,6 +406,7 @@ function getDataFrom(url, onRetrieve, onError, tag){
     req.send(null);
 }
 
+// MOZILLA FIREFOX FUNCTION OVERRIDE TO FIX A BUG
 function FillInHTMLTooltip(tipElement)
 {
   var retVal = false;
@@ -499,4 +455,65 @@ function FillInHTMLTooltip(tipElement)
   }
 
   return retVal;
+}
+
+function setLabelNTooltip(check, matches, tooltipArray, tt2str){
+  // MANY SUBS
+  if(check && matches > 1){
+    // label looks like: There are N new subs
+    var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
+      + matches
+      + " "
+      + itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
+
+    // tooltip look like: New subs: <series list>
+    var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + tt2str;
+
+    statusbar.label = label;
+    statusbar.tooltipText = tooltip;
+    showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
+  }
+  // JUST ONE SUB
+  else if(check && matches==1){
+
+    var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
+    var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + "\n" + tt2str;
+
+    statusbar.label = label;
+    statusbar.tooltipText = tooltip;
+    showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
+  }
+  // NO SUBS
+  else {
+    statusbar.label = itasaProp.GetStringFromName("itasanotifier.title");
+    statusbar.tooltipText = latest20subs;
+  }
+}
+
+function showNotificationAlert(lastSub){
+  var listener = {
+  observe: function(subject, topic, data) {
+      if(topic === "alertclickcallback"){
+	//var win = window.open(data, "Last sub", "width=800,height=600,scrollbars=no,menubar=no" );
+	gBrowser.addTab(data);
+	gBrowser.selectedTab = gBrowser.newTab;
+	itasanotifier.clearStatusBar();
+      }
+      else if (topic === "alertfinished") lastPopupLink = data;
+    }
+  }
+  
+  var lastTitle = lastSub.title;
+  var lastLink = lastSub.link;
+
+  if (showPopup === true && lastLink !== lastPopupLink)
+    {
+      alertsService.showAlertNotification("chrome://mozapps/skin/downloads/downloadIcon.png", 
+					  itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub"),
+					  lastTitle,
+					  true,
+					  lastLink ,
+					  listener);
+      lastPopupLink = lastLink;
+    }
 }
