@@ -325,6 +325,9 @@ function amIInterested(nodes){
   // latest 20 subs (titles)
   // and creates matchingSeries array
   for(n=0; n < pref_savedseriesarray.length; n++){
+    if (pref_savedseriesarray[n].indexOf("C.S.I") == 0){
+	  pref_savedseriesarray[n] = pref_savedseriesarray[n].replace(/C.S.I./i, "CSI:");
+    }
     for(i=0; i < nodes.length; i++){
       if(nodes[i].title.indexOf(pref_savedseriesarray[n]) != -1){
 	check = true;
