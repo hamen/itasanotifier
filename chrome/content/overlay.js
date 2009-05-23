@@ -322,20 +322,25 @@ function amIInterested(nodes){
   toDownload = [];
 
   // compares series you watch (saved in pref_savedseriesarray) against
-  // latest 20 subs (titles)
+  // latest 20 subs (nodes)
   // and creates matchingSeries array
   for(n=0; n < pref_savedseriesarray.length; n++){
     if (pref_savedseriesarray[n].indexOf("C.S.I") == 0){
 	  pref_savedseriesarray[n] = pref_savedseriesarray[n].replace(/C.S.I./i, "CSI:");
     }
     for(i=0; i < nodes.length; i++){
-      if(nodes[i].title.indexOf(pref_savedseriesarray[n]) != -1){
-	check = true;
-	matches++;
-	matchingSeries.push(nodes[i]);
-	dump("Match found: " + pref_savedseriesarray[n] + " matches " + nodes[i].title + "\n");
-	tooltip.push(nodes[i]);
-	toDownload.push(nodes[i]);
+      if(nodes[i].title.indexOf(pref_savedseriesarray[n]) == 0){
+	// Special check for House mismatching issue
+	if (pref_savedseriesarray[n] === "House" && nodes[i].title.indexOf("Saddam") != -1 ){
+	}
+	else{
+	  check = true;
+	  matches++;
+	  matchingSeries.push(nodes[i]);
+	  dump("Match found: " + pref_savedseriesarray[n] + " matches " + nodes[i].title + "\n");
+	  tooltip.push(nodes[i]);
+	  toDownload.push(nodes[i]);
+	}
       }
     }
   }
