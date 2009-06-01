@@ -105,9 +105,6 @@ function addToMyList(){
   var itemIndex = thelist.selectedIndex;
   var item = thelist.getItemAtIndex(itemIndex);
   if(item.label === undefined) alert("item.label is undefined");
-  if(item.label.indexOf("'") != -1){
-    item.label = item.label.replace("'", "", "gi");
-  }
   myserieslist.appendItem(item.label);
   
   listHasChanged = document.getElementById('listHasChanged');
