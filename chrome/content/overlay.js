@@ -166,6 +166,39 @@ var itasanotifier = {
 					    listener);
 	lastPopupLink = lastLink;
       }
+  },
+
+  getList: function () {
+    var req = new XMLHttpRequest();
+    req.overrideMimeType('text/xml');
+    req.open('GET', urlSubs, true);
+
+    req.onreadystatechange = function (aEvt) {
+      if (req.readyState == 4) {
+	if(req.status == 200){
+	  //Print series page as html
+	  // I know this method sucks, but XML sent from server is wrong and XML parser fails
+	  var seriesTXTList = req.responseText;
+	  var re = new RegExp('("> ).+(</a>)', "g");
+
+	  var matches_array = seriesTXTList.match(re);
+	  
+	  var series = new Array();
+		
+	  var i;
+	  for(i=0; i < matches_array.length; i++){
+	    var temp = matches_array[i].replace('"> ', "", "gi");
+	    matches_array[i] = temp;
+	    temp = matches_array[i].replace('</a>', "", "gi");
+	    series[i]= temp;
+	    seriesarray[i] = temp;
+	  }
+	}
+	else
+	  dump("Error loading page\n");
+      }
+    };
+    req.send(null); 
   }
 };
 
@@ -176,39 +209,39 @@ window.addEventListener("load", function(e) {
 	
   }, false);
 
-function getList(){
+// function getList(){
 
-  var req = new XMLHttpRequest();
-  req.overrideMimeType('text/xml');
-  req.open('GET', urlSubs, true);
+//   var req = new XMLHttpRequest();
+//   req.overrideMimeType('text/xml');
+//   req.open('GET', urlSubs, true);
 
-  req.onreadystatechange = function (aEvt) {
-     if (req.readyState == 4) {
-      if(req.status == 200){
-	//Print series page as html
-	// I know this method sucks, but XML sent from server is wrong and XML parser fails
-	var seriesTXTList = req.responseText;
-	var re = new RegExp('("> ).+(</a>)', "g");
+//   req.onreadystatechange = function (aEvt) {
+//      if (req.readyState == 4) {
+//       if(req.status == 200){
+// 	//Print series page as html
+// 	// I know this method sucks, but XML sent from server is wrong and XML parser fails
+// 	var seriesTXTList = req.responseText;
+// 	var re = new RegExp('("> ).+(</a>)', "g");
 
-	var matches_array = seriesTXTList.match(re);
+// 	var matches_array = seriesTXTList.match(re);
 	  
-	var series = new Array();
+// 	var series = new Array();
 		
-	var i;
-	for(i=0; i < matches_array.length; i++){
-	  var temp = matches_array[i].replace('"> ', "", "gi");
-	  matches_array[i] = temp;
-	  temp = matches_array[i].replace('</a>', "", "gi");
-	  series[i]= temp;
-	  seriesarray[i] = temp;
-	}
-      }
-      else
-	dump("Error loading page\n");
-    }
-  };
-  req.send(null); 
-}
+// 	var i;
+// 	for(i=0; i < matches_array.length; i++){
+// 	  var temp = matches_array[i].replace('"> ', "", "gi");
+// 	  matches_array[i] = temp;
+// 	  temp = matches_array[i].replace('</a>', "", "gi");
+// 	  series[i]= temp;
+// 	  seriesarray[i] = temp;
+// 	}
+//       }
+//       else
+// 	dump("Error loading page\n");
+//     }
+//   };
+//   req.send(null); 
+// }
 
 
 
@@ -300,7 +333,7 @@ function setTB_label_tooltip(l20s_a, check, matches, tt){
   if(check){
     var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
     itasaStatusPopupDownload.disabled = false;
-    getList();
+    itasanotifier.getList();
   }
     
   setLabelNTooltip(check, matches, tt, tt2str);
@@ -526,30 +559,30 @@ function setLabelNTooltip(check, matches, tooltipArray, tt2str){
   }
 }
 
-function showNotificationAlert(lastSub){
-  var listener = {
-  observe: function(subject, topic, data) {
-      if(topic === "alertclickcallback"){
-	//var win = window.open(data, "Last sub", "width=800,height=600,scrollbars=no,menubar=no" );
-	gBrowser.addTab(data);
-	gBrowser.selectedTab = gBrowser.newTab;
-	itasanotifier.clearStatusBar();
-      }
-      else if (topic === "alertfinished") lastPopupLink = data;
-    }
-  }
+// function showNotificationAlert(lastSub){
+//   var listener = {
+//   observe: function(subject, topic, data) {
+//       if(topic === "alertclickcallback"){
+// 	//var win = window.open(data, "Last sub", "width=800,height=600,scrollbars=no,menubar=no" );
+// 	gBrowser.addTab(data);
+// 	gBrowser.selectedTab = gBrowser.newTab;
+// 	itasanotifier.clearStatusBar();
+//       }
+//       else if (topic === "alertfinished") lastPopupLink = data;
+//     }
+//   }
   
-  var lastTitle = lastSub.title;
-  var lastLink = lastSub.link;
+//   var lastTitle = lastSub.title;
+//   var lastLink = lastSub.link;
 
-  if (showPopup === true && lastLink !== lastPopupLink)
-    {
-      alertsService.showAlertNotification("chrome://mozapps/skin/downloads/downloadIcon.png", 
-					  itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub"),
-					  lastTitle,
-					  true,
-					  lastLink ,
-					  listener);
-      lastPopupLink = lastLink;
-    }
-}
+//   if (showPopup === true && lastLink !== lastPopupLink)
+//     {
+//       alertsService.showAlertNotification("chrome://mozapps/skin/downloads/downloadIcon.png", 
+// 					  itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub"),
+// 					  lastTitle,
+// 					  true,
+// 					  lastLink ,
+// 					  listener);
+//       lastPopupLink = lastLink;
+//     }
+// }
