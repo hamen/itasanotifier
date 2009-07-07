@@ -138,6 +138,34 @@ var itasanotifier = {
       gBrowser.selectedTab = gBrowser.newTab;
       }
     this.clearStatusBar();
+  },
+
+  showNotificationAlert: function (lastSub) {
+    var listener = {
+    observe: function(subject, topic, data) {
+	if(topic === "alertclickcallback"){
+	  //var win = window.open(data, "Last sub", "width=800,height=600,scrollbars=no,menubar=no" );
+	  gBrowser.addTab(data);
+	  gBrowser.selectedTab = gBrowser.newTab;
+	  itasanotifier.clearStatusBar();
+	}
+	else if (topic === "alertfinished") lastPopupLink = data;
+      }
+    }
+  
+    var lastTitle = lastSub.title;
+    var lastLink = lastSub.link;
+
+    if (showPopup === true && lastLink !== lastPopupLink)
+      {
+	alertsService.showAlertNotification("chrome://mozapps/skin/downloads/downloadIcon.png", 
+					    itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub"),
+					    lastTitle,
+					    true,
+					    lastLink ,
+					    listener);
+	lastPopupLink = lastLink;
+      }
   }
 };
 
@@ -359,7 +387,7 @@ function getDataFrom(url, onRetrieve, onError, tag){
 	  var i, n;
 	  var nodeList = [];
 	  var l20Subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
-	  
+  
 	  switch(tag){
 	  case "titles":
 	  var nodes = req.responseXML.getElementsByTagName("title");
@@ -479,7 +507,7 @@ function setLabelNTooltip(check, matches, tooltipArray, tt2str){
 
     statusbar.label = label;
     statusbar.tooltipText = tooltip;
-    showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
+    itasanotifier.showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
   }
   // JUST ONE SUB
   else if(check && matches==1){
@@ -489,7 +517,7 @@ function setLabelNTooltip(check, matches, tooltipArray, tt2str){
 
     statusbar.label = label;
     statusbar.tooltipText = tooltip;
-    showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
+    itasanotifier.showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
   }
   // NO SUBS
   else {
