@@ -5,3 +5,4 @@ update.rdf
 *.org
 xpi.sh
 .#*
+Makefile
