@@ -18,22 +18,6 @@
 */
 
 // ----------------------------------------------------------------------
-// GLOBAL DEFINITIONS
-var timer;
-var pref_savedseriesarray;
-var titles;
-var statusbar;
-var readSubs = [];
-var seriesNid = new Array();
-var toDownload = [];
-var seriesarray = [];
-var matchingSeries = [];
-var latest20subs;
-var latest20subsNlinks;
-var alreadyDownloaded = [];
-var winAlreadyOpen;
-var lastPopupLink;
-var showPopup;
 
 const url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
 const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
@@ -52,13 +36,100 @@ const itasaProp = Components.classes["@mozilla.org/intl/stringbundle;1"]
   .createBundle("chrome://itasanotifier/locale/itasanotifier.properties");
 
 const alertsService = Components.classes["@mozilla.org/alerts-service;1"]
-                              .getService(Components.interfaces.nsIAlertsService);
+  .getService(Components.interfaces.nsIAlertsService);
 
 // ----------------------------------------------------------------------
 
 
 var itasanotifier = {
-  onLoad: function() {
+  
+ alreadyDownloaded: [],
+ lastPopupLink: '',
+ latest20subs: '',
+ latest20subsNlinks: '',
+ matchingSeries: [],
+ pref_savedseriesarray: '',
+ readSubs: [],
+ seriesarray: [],
+ seriesNid: new Array(),
+ showPopup: '',
+ statusbar: '',
+ timer: '',
+ titles: '',
+ toDownload: [],
+ winAlreadyOpen: '',
+
+ periodicallyFetch: function (timer) {
+    this.getDataFrom(url, this.amIInterested, function(status) {
+	// report error
+      }, "titles+links");
+  },
+ 
+ amIInterested: function(nodes) {
+    
+    //  nodes.forEach(function(item){dump(item.toSource());});
+
+    pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
+    var check = false;
+    statusbar.tooltipText= "";
+
+    var tooltip = [];
+    var i, n, matches = 0;
+    var latest20subs_array = [];
+
+    var readSubs = [];
+    readSubs[0] = false;
+  
+    toDownload = [];
+
+    // compares series you watch (saved in pref_savedseriesarray) against
+    // latest 20 subs (nodes)
+    // and creates matchingSeries array
+    for(n=0; n < pref_savedseriesarray.length; n++){
+      if (pref_savedseriesarray[n].indexOf("C.S.I") == 0){
+	pref_savedseriesarray[n] = pref_savedseriesarray[n].replace(/C.S.I./i, "CSI:");
+      }
+      for(i=0; i < nodes.length; i++){
+	if(nodes[i].title.indexOf(pref_savedseriesarray[n]) == 0){
+	  // Special check for House mismatching issue
+	  if (pref_savedseriesarray[n] === "House" && nodes[i].title.indexOf("Saddam") != -1 ){
+	  }
+	  else{
+	    check = true;
+	    matches++;
+	    itasanotifier.matchingSeries.push(nodes[i]);
+	    dump("Match found: " + pref_savedseriesarray[n] + " matches " + nodes[i].title + "\n");
+	    tooltip.push(nodes[i]);
+	    toDownload.push(nodes[i]);
+	  }
+	}
+      }
+    }
+ 
+    itasanotifier.setTB_label_tooltip(itasanotifier.matchingSeries, check, matches, tooltip );
+  },
+ 
+ fetchRSS: function() {
+    var count = 0;
+    var previousFirstElement;
+
+    // First call after Firefox launch
+    this.getDataFrom(url, this.amIInterested, function(status) {
+	// report error
+      }, "titles+links");
+
+    // Event called periodically using the timer
+    var event
+    = { notify: function(timer){
+	itasanotifier.periodicallyFetch(timer); 
+      } }
+
+    // creates the timer
+    timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
+    timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
+  },
+ 
+ onLoad: function() {
     // Add icon to toolbar on first install
     // Should be replaced with new function suggested by bard
     var firstInstall = eval(pref.getBoolPref('firstInstall'));
@@ -72,7 +143,7 @@ var itasanotifier = {
     this.initialized = true;
     this.strings = document.getElementById("itasanotifier-strings");
     document.getElementById("contentAreaContextMenu")
-            .addEventListener("popupshowing", function(e) { this.showContextMenu(e); }, false);
+    .addEventListener("popupshowing", function(e) { itasanotifier.showContextMenu(e); }, false);
     
     statusbar = document.getElementById('itasa-status-bar');
     
@@ -81,66 +152,66 @@ var itasanotifier = {
     var alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
     if(alreadyDownloaded === undefined) showPopup = true;
     
-    fetchRSS();
+    itasanotifier.fetchRSS();
   },
 
-  showContextMenu: function(event) {
+ showContextMenu: function(event) {
     // show or hide the menuitem based on what the context menu is on
     // see http://kb.mozillazine.org/Adding_items_to_menus
     document.getElementById("context-itasanotifier").hidden = gContextMenu.onImage;
   },
-  onMenuItemCommand: function(e) {
+ onMenuItemCommand: function(e) {
     // Opens Options Dialog
-     window.openDialog("chrome://itasanotifier/content/preferences.xul");
+    window.openDialog("chrome://itasanotifier/content/preferences.xul");
   },
-  onToolbarButtonCommand: function(e) {
+ onToolbarButtonCommand: function(e) {
     window.openDialog("chrome://itasanotifier/content/preferences.xul");
   },
   
-  resetTooltip: function(e){
+ resetTooltip: function(e) {
     var statusbar = document.getElementById('itasa-status-bar');
     statusbar.label = "ItasaNotifier";
   },
-  aboutItasaNotifier: function(e){
+ aboutItasaNotifier: function(e){
     window.openDialog("chrome://itasanotifier/content/about.xul");
   },
 
-  clearStatusBar: function(e){
+ clearStatusBar: function(e) {
     // Reset statusbar label and tooltip text
     statusbar.label = itasaProp.GetStringFromName("itasanotifier.title");
 
-    statusbar.tooltipText = latest20subs;
+    statusbar.tooltipText = itasanotifier.latest20subs;
 
     var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
     itasaStatusPopupDownload.disabled = true;
     readSubs[0] = true;
     
     pref.setCharPref('alreadyDownloaded', toDownload.toSource());
-    alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
+    itasanotifier.alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
     showPopup = false;
   },
 
-  stopTimer: function(e){
+ stopTimer: function(e) {
     timer.cancel();
     dump("Timer deleted\n");
     statusbar.label = "ItasaNotifier";
     statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.updatesStopped");
   },
 
-  showLatest20Subs: function(e){
-    if(latest20subs) alert(latest20subs);
+ showLatest20Subs: function(e){
+    if(itasanotifier.latest20subs) alert(itasanotifier.latest20subs);
   },
 
-  downloadSubs: function(e) {
+ downloadSubs: function(e) {
     var i;
     for(i=0; i < toDownload.length; i++){
       gBrowser.addTab(toDownload[i].link);
       gBrowser.selectedTab = gBrowser.newTab;
-      }
+    }
     this.clearStatusBar();
   },
 
-  showNotificationAlert: function (lastSub) {
+ showNotificationAlert: function(lastSub) {
     var listener = {
     observe: function(subject, topic, data) {
 	if(topic === "alertclickcallback"){
@@ -149,14 +220,14 @@ var itasanotifier = {
 	  gBrowser.selectedTab = gBrowser.newTab;
 	  itasanotifier.clearStatusBar();
 	}
-	else if (topic === "alertfinished") lastPopupLink = data;
+	else if (topic === "alertfinished") itasanotifier.lastPopupLink = data;
       }
     }
   
     var lastTitle = lastSub.title;
     var lastLink = lastSub.link;
 
-    if (showPopup === true && lastLink !== lastPopupLink)
+    if (showPopup === true && lastLink !== itasanotifier.lastPopupLink)
       {
 	alertsService.showAlertNotification("chrome://mozapps/skin/downloads/downloadIcon.png", 
 					    itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub"),
@@ -164,11 +235,11 @@ var itasanotifier = {
 					    true,
 					    lastLink ,
 					    listener);
-	lastPopupLink = lastLink;
+	itasanotifier.lastPopupLink = lastLink;
       }
   },
 
-  getList: function () {
+ getList: function() {
     var req = new XMLHttpRequest();
     req.overrideMimeType('text/xml');
     req.open('GET', urlSubs, true);
@@ -191,7 +262,7 @@ var itasanotifier = {
 	    matches_array[i] = temp;
 	    temp = matches_array[i].replace('</a>', "", "gi");
 	    series[i]= temp;
-	    seriesarray[i] = temp;
+	    itasanotifier.seriesarray[i] = temp;
 	  }
 	}
 	else
@@ -199,219 +270,108 @@ var itasanotifier = {
       }
     };
     req.send(null); 
-  }
-};
-
-// ON LOAD
-window.addEventListener("load", function(e) {
-    // Load main object
-    itasanotifier.onLoad(e);
-	
-  }, false);
-
-// function getList(){
-
-//   var req = new XMLHttpRequest();
-//   req.overrideMimeType('text/xml');
-//   req.open('GET', urlSubs, true);
-
-//   req.onreadystatechange = function (aEvt) {
-//      if (req.readyState == 4) {
-//       if(req.status == 200){
-// 	//Print series page as html
-// 	// I know this method sucks, but XML sent from server is wrong and XML parser fails
-// 	var seriesTXTList = req.responseText;
-// 	var re = new RegExp('("> ).+(</a>)', "g");
-
-// 	var matches_array = seriesTXTList.match(re);
-	  
-// 	var series = new Array();
-		
-// 	var i;
-// 	for(i=0; i < matches_array.length; i++){
-// 	  var temp = matches_array[i].replace('"> ', "", "gi");
-// 	  matches_array[i] = temp;
-// 	  temp = matches_array[i].replace('</a>', "", "gi");
-// 	  series[i]= temp;
-// 	  seriesarray[i] = temp;
-// 	}
-//       }
-//       else
-// 	dump("Error loading page\n");
-//     }
-//   };
-//   req.send(null); 
-// }
-
-
-
-
-function modifyToolbarButtons(modifier) {
-    var toolbar =
-        document.getElementById('nav-bar') ||
-        document.getElementById('mail-bar') ||
-        document.getElementById('mail-bar2');
-
-    if(!toolbar)
-        return;
-
-    if(toolbar.getAttribute('customizable') == 'true') {
-        var newSet = modifier(toolbar.currentSet);
-        if(!newSet)
-            return;
-
-        toolbar.currentSet = newSet;
-        toolbar.setAttribute('currentset', toolbar.currentSet);
-        toolbar.ownerDocument.persist(toolbar.id, 'currentset');
-        try { BrowserToolboxCustomizeDone(true); } catch (e) {}
-    }
-}
-
-function addToolbarButton(buttonId) {
-    modifyToolbarButtons(function(set) {
-        if(set.indexOf(buttonId) == -1)
-            return set.replace(/(urlbar-container|separator)/,
-                               buttonId + ',$1');
-    });
-}
-
-// Create a purged list of series to show in tooltip
-// based on which series has been marked as already
-// read in a previous session
-function purgeList(currentSeries){
-  alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
-
-  var newSeries = [];
-  if (alreadyDownloaded === "[]" || alreadyDownloaded === undefined){
-    //alert("alreadyDownloaded is undefined" + "\n" + "currentSeries is:" + currentSeries.toSource());
-    return currentSeries;
-  }
-  else if (alreadyDownloaded.toSource() === currentSeries.toSource()) {
-    //alert("arrays match");
-    return newSeries;
-  }
-  else {
-    //alert("alreadyDownloaded is:\n" + alreadyDownloaded.toSource() + "\n" + "currentSeries is:\n" + currentSeries.toSource());
-    
-    var i, n, matches = 0;
-    for (i = 0; i < currentSeries.length; matches = 0, i++){
-      for (n = 0; n < alreadyDownloaded.length; n++){
-	var currentTitle = currentSeries[i].title;
-	var oldTitle = alreadyDownloaded[n].title;
-	
-	if (currentTitle === oldTitle){
-	  //alert(currentTitle + "\n" + oldTitle);	  
-	  matches++;
-	}
-	//alert("matches is: " + matches);
-      }
-      if (matches === 0)
-	newSeries.push(currentSeries[i]);
-    }
-    //alert(newSeries.toSource());
-  }
-  return newSeries;
-}
-
-function setTB_label_tooltip(l20s_a, check, matches, tt){
-  // Create toolbar label and tooltip
-  var latest20subs = "\n" + itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
-  for(i=0; i < l20s_a.length; i++){
-    latest20subs += l20s_a[i].title + "\n";
-  }
-  
-  // CHECK THIS FUNCTION
-  // CHECK tt
-  tt = purgeList(tt);
-
-  var i, tt2str = "";
-  for(i=0; i < tt.length; i++){
-    tt2str += tt[i].title + "\n";
-  }
-
-  matches = tt.length;
-  if(check){
-    var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
-    itasaStatusPopupDownload.disabled = false;
-    itasanotifier.getList();
-  }
-    
-  setLabelNTooltip(check, matches, tt, tt2str);
-}
-
-function fetchRSS(){
-  var count = 0;
-  var previousFirstElement;
-
-  // First call after Firefox launch
-  getDataFrom(url, amIInterested, function(status) {
-      // report error
-    }, "titles+links");
-
-  // Event called periodically using the timer
-  var event
-    = { notify: function(timer){
-      periodicallyFetch(timer); 
-    } }
-
-  // creates the timer
-  timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
-  timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
-}
-
-function periodicallyFetch(timer){
-  getDataFrom(url, amIInterested, function(status) {
-      // report error
-    }, "titles+links");
-}
-
-function amIInterested(nodes){
-
-  //  nodes.forEach(function(item){dump(item.toSource());});
-
-  pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
-  var check = false;
-  statusbar.tooltipText= "";
-
-  var tooltip = [];
-  var i, n, matches = 0;
-  var latest20subs_array = [];
-
-  var readSubs = [];
-  readSubs[0] = false;
-  
-  toDownload = [];
-
-  // compares series you watch (saved in pref_savedseriesarray) against
-  // latest 20 subs (nodes)
-  // and creates matchingSeries array
-  for(n=0; n < pref_savedseriesarray.length; n++){
-    if (pref_savedseriesarray[n].indexOf("C.S.I") == 0){
-	  pref_savedseriesarray[n] = pref_savedseriesarray[n].replace(/C.S.I./i, "CSI:");
-    }
-    for(i=0; i < nodes.length; i++){
-      if(nodes[i].title.indexOf(pref_savedseriesarray[n]) == 0){
-	// Special check for House mismatching issue
-	if (pref_savedseriesarray[n] === "House" && nodes[i].title.indexOf("Saddam") != -1 ){
-	}
-	else{
-	  check = true;
-	  matches++;
-	  matchingSeries.push(nodes[i]);
-	  dump("Match found: " + pref_savedseriesarray[n] + " matches " + nodes[i].title + "\n");
-	  tooltip.push(nodes[i]);
-	  toDownload.push(nodes[i]);
-	}
-      }
-    }
-  }
+  },
  
-  setTB_label_tooltip(matchingSeries, check, matches, tooltip );
-}
+ setTB_label_tooltip: function(l20s_a, check, matches, tt) {
+    // Create toolbar label and tooltip
+    var latest20subs = "\n" + itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
+    for(i=0; i < l20s_a.length; i++){
+      latest20subs += l20s_a[i].title + "\n";
+    }
+  
+    // CHECK THIS FUNCTION
+    // CHECK tt
+    tt = this.purgeList(tt);
 
-function getDataFrom(url, onRetrieve, onError, tag){
+    var i, tt2str = "";
+    for(i=0; i < tt.length; i++){
+      tt2str += tt[i].title + "\n";
+    }
+
+    matches = tt.length;
+    if(check){
+      var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
+      itasaStatusPopupDownload.disabled = false;
+      itasanotifier.getList();
+    }
+    
+    this.setLabelNTooltip(check, matches, tt, tt2str);
+  },
+
+ setLabelNTooltip: function(check, matches, tooltipArray, tt2str) {
+    // MANY SUBS
+    if(check && matches > 1){
+      // label looks like: There are N new subs
+      var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
+      + matches
+      + " "
+      + itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
+
+      // tooltip look like: New subs: <series list>
+      var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + tt2str;
+
+      statusbar.label = label;
+      statusbar.tooltipText = tooltip;
+      itasanotifier.showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
+    }
+    // JUST ONE SUB
+    else if(check && matches==1){
+
+      var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
+      var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + "\n" + tt2str;
+
+      statusbar.label = label;
+      statusbar.tooltipText = tooltip;
+      itasanotifier.showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
+    }
+    // NO SUBS
+    else {
+      statusbar.label = itasaProp.GetStringFromName("itasanotifier.title");
+      statusbar.tooltipText = latest20subs;
+    }
+  },
+
+ // Create a purged list of series to show in tooltip
+ // based on which series has been marked as already
+ // read in a previous session
+ purgeList: function(currentSeries) {
+    itasanotifier.alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
+
+    var newSeries = [];
+    if (itasanotifier.alreadyDownloaded === "[]" || itasanotifier.alreadyDownloaded === undefined){
+      //alert("alreadyDownloaded is undefined" + "\n" + "currentSeries is:" + currentSeries.toSource());
+      return currentSeries;
+    }
+    else if (itasanotifier.alreadyDownloaded.toSource() === currentSeries.toSource()) {
+      //alert("arrays match");
+      return newSeries;
+    }
+    else {
+      //alert("alreadyDownloaded is:\n" + alreadyDownloaded.toSource() + "\n" + "currentSeries is:\n" + currentSeries.toSource());
+    
+      var i, n, matches = 0;
+      for (i = 0; i < currentSeries.length; matches = 0, i++){
+	for (n = 0; n < itasanotifier.alreadyDownloaded.length; n++){
+	  var currentTitle = currentSeries[i].title;
+	  var oldTitle = itasanotifier.alreadyDownloaded[n].title;
+	
+	  if (currentTitle === oldTitle){
+	    //alert(currentTitle + "\n" + oldTitle);	  
+	    matches++;
+	  }
+	  //alert("matches is: " + matches);
+	}
+	if (matches === 0)
+	  newSeries.push(currentSeries[i]);
+      }
+      //alert(newSeries.toSource());
+    }
+    return newSeries;
+  },
+
+ getDataFrom: function(url, onRetrieve, onError, tag) {
     var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-      .createInstance(Components.interfaces.nsIXMLHttpRequest);
+    .createInstance(Components.interfaces.nsIXMLHttpRequest);
     req.open("GET", url, true);
     
     req.onreadystatechange = function (aEvt) {
@@ -423,45 +383,45 @@ function getDataFrom(url, onRetrieve, onError, tag){
   
 	  switch(tag){
 	  case "titles":
-	  var nodes = req.responseXML.getElementsByTagName("title");
-	  for(i=1; i< nodes.length; i++){
-	    nodeList.push(nodes[i].textContent);
-	  }
+	    var nodes = req.responseXML.getElementsByTagName("title");
+	    for(i=1; i< nodes.length; i++){
+	      nodeList.push(nodes[i].textContent);
+	    }
 	  
-	  var l20Subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
-	  for(i=1; i < nodes.length; i++){
-	    l20Subs += nodes[i].textContent + "\n";
-	  }
-	  latest20subs = l20Subs;
-	  break;
+	    var l20Subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
+	    for(i=1; i < nodes.length; i++){
+	      l20Subs += nodes[i].textContent + "\n";
+	    }
+	    itasanotifier.latest20subs = l20Subs;
+	    break;
 	  
 	  case "links":
-	  var nodes = req.responseXML.getElementsByTagName("link");
-	  for(i=1; i < nodes.length; i++){
-	    nodeList.push(nodes[i].textContent);
-	  }
-	  break;
+	    var nodes = req.responseXML.getElementsByTagName("link");
+	    for(i=1; i < nodes.length; i++){
+	      nodeList.push(nodes[i].textContent);
+	    }
+	    break;
 
 	  case "titles+links":
-	  var titles = req.responseXML.getElementsByTagName("title");
-	  var links = req.responseXML.getElementsByTagName("link");
+	    var titles = req.responseXML.getElementsByTagName("title");
+	    var links = req.responseXML.getElementsByTagName("link");
 
-	  if(links.length == titles.length){
-	    for(i=1, n=0; i < titles.length; i++, n++){
-	     nodeList.push({
-	       title: titles[i].textContent,
-	       link: links[i].textContent});
-	     l20Subs += titles[i].textContent + "\n";
-	    }
+	    if(links.length == titles.length){
+	      for(i=1, n=0; i < titles.length; i++, n++){
+		nodeList.push({
+		  title: titles[i].textContent,
+		      link: links[i].textContent});
+		l20Subs += titles[i].textContent + "\n";
+	      }
 	
-	    latest20subs = l20Subs;
-	    latest20subsNlinks = nodeList;
-	  }
-	  else alert("lengths mismatch");
-	  break;
+	      itasanotifier.latest20subs = l20Subs;
+	      latest20subsNlinks = nodeList;
+	    }
+	    else alert("lengths mismatch");
+	    break;
 
 	  default:
-	  var nodes = req.responseXML.getElementsByTagName("title");
+	    var nodes = req.responseXML.getElementsByTagName("title");
 	  }
 
 	  onRetrieve(nodeList);
@@ -469,12 +429,48 @@ function getDataFrom(url, onRetrieve, onError, tag){
 	else
 	  onError(req.status);
       }
-        else
-	  onError();
+      else
+	onError();
     }
     req.send(null);
+  }
+};
+
+// ON LOAD
+window.addEventListener("load", function(e) {
+    // Load main object
+    itasanotifier.onLoad(e);
+	
+  }, false);
+
+function modifyToolbarButtons(modifier) {
+  var toolbar =
+    document.getElementById('nav-bar') ||
+    document.getElementById('mail-bar') ||
+    document.getElementById('mail-bar2');
+
+  if(!toolbar)
+    return;
+
+  if(toolbar.getAttribute('customizable') == 'true') {
+    var newSet = modifier(toolbar.currentSet);
+    if(!newSet)
+      return;
+
+    toolbar.currentSet = newSet;
+    toolbar.setAttribute('currentset', toolbar.currentSet);
+    toolbar.ownerDocument.persist(toolbar.id, 'currentset');
+    try { BrowserToolboxCustomizeDone(true); } catch (e) {}
+  }
 }
 
+function addToolbarButton(buttonId) {
+  modifyToolbarButtons(function(set) {
+      if(set.indexOf(buttonId) == -1)
+	return set.replace(/(urlbar-container|separator)/,
+			   buttonId + ',$1');
+    });
+}
 // MOZILLA FIREFOX FUNCTION OVERRIDE TO FIX A BUG
 function FillInHTMLTooltip(tipElement)
 {
@@ -508,81 +504,20 @@ function FillInHTMLTooltip(tipElement)
   tipNode.style.direction = direction;
   
   for each (var t in [titleText, XLinkTitleText]) {
-    if (t && t.replace && /\S/.test(t)) {
+      if (t && t.replace && /\S/.test(t)) {
 
-      // Per HTML 4.01 6.2 (CDATA section), literal CRs and tabs should be
-      // replaced with spaces, and LFs should be removed entirely.
-      // XXX Bug 322270: We don't preserve the result of entities like &#13;,
-      // which should result in a line break in the tooltip, because we can't
-      // distinguish that from a literal character in the source by this point.
-      t = t.replace(/[\r\t]/g, ' ');
-      t = t.replace(/\n/g, '');
+	// Per HTML 4.01 6.2 (CDATA section), literal CRs and tabs should be
+	// replaced with spaces, and LFs should be removed entirely.
+	// XXX Bug 322270: We don't preserve the result of entities like &#13;,
+	// which should result in a line break in the tooltip, because we can't
+	// distinguish that from a literal character in the source by this point.
+	t = t.replace(/[\r\t]/g, ' ');
+	t = t.replace(/\n/g, '');
 
-      tipNode.setAttribute("label", t);
-      retVal = true;
+	tipNode.setAttribute("label", t);
+	retVal = true;
+      }
     }
-  }
 
   return retVal;
 }
-
-function setLabelNTooltip(check, matches, tooltipArray, tt2str){
-  // MANY SUBS
-  if(check && matches > 1){
-    // label looks like: There are N new subs
-    var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
-      + matches
-      + " "
-      + itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
-
-    // tooltip look like: New subs: <series list>
-    var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + tt2str;
-
-    statusbar.label = label;
-    statusbar.tooltipText = tooltip;
-    itasanotifier.showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
-  }
-  // JUST ONE SUB
-  else if(check && matches==1){
-
-    var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
-    var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + "\n" + tt2str;
-
-    statusbar.label = label;
-    statusbar.tooltipText = tooltip;
-    itasanotifier.showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
-  }
-  // NO SUBS
-  else {
-    statusbar.label = itasaProp.GetStringFromName("itasanotifier.title");
-    statusbar.tooltipText = latest20subs;
-  }
-}
-
-// function showNotificationAlert(lastSub){
-//   var listener = {
-//   observe: function(subject, topic, data) {
-//       if(topic === "alertclickcallback"){
-// 	//var win = window.open(data, "Last sub", "width=800,height=600,scrollbars=no,menubar=no" );
-// 	gBrowser.addTab(data);
-// 	gBrowser.selectedTab = gBrowser.newTab;
-// 	itasanotifier.clearStatusBar();
-//       }
-//       else if (topic === "alertfinished") lastPopupLink = data;
-//     }
-//   }
-  
-//   var lastTitle = lastSub.title;
-//   var lastLink = lastSub.link;
-
-//   if (showPopup === true && lastLink !== lastPopupLink)
-//     {
-//       alertsService.showAlertNotification("chrome://mozapps/skin/downloads/downloadIcon.png", 
-// 					  itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub"),
-// 					  lastTitle,
-// 					  true,
-// 					  lastLink ,
-// 					  listener);
-//       lastPopupLink = lastLink;
-//     }
-// }
