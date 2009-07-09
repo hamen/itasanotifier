@@ -17,32 +17,21 @@
   Author: Ivan Morgillo < imorgillo [at] sanniolug [dot] org >
 */
 
-// ----------------------------------------------------------------------
-
-const url = "http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/";
-const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
-/* Enable external scripts import */
-//const loader = Cc['@mozilla.org/moz/jssubscript-loader;1']
-//.getService(Ci.mozIJSSubScriptLoader);
-
-/* Initialize interfaces to manage prefs */
-const pref = Components
-  .classes["@mozilla.org/preferences-service;1"]
-  .getService(Components.interfaces.nsIPrefService)
-  .getBranch('extensions.itasanotifier.');
-
-const itasaProp = Components.classes["@mozilla.org/intl/stringbundle;1"]
-  .getService(Components.interfaces.nsIStringBundleService)
-  .createBundle("chrome://itasanotifier/locale/itasanotifier.properties");
-
-const alertsService = Components.classes["@mozilla.org/alerts-service;1"]
-  .getService(Components.interfaces.nsIAlertsService);
-
-// ----------------------------------------------------------------------
-
-
 var itasanotifier = {
-  
+ url: 'http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/',
+ urlSubs: 'http://www.italiansubs.net/Sottotitoli/',
+ pref: Components
+     .classes["@mozilla.org/preferences-service;1"]
+     .getService(Components.interfaces.nsIPrefService)
+     .getBranch('extensions.itasanotifier.'),
+ itasaProp: Components
+     .classes["@mozilla.org/intl/stringbundle;1"]
+     .getService(Components.interfaces.nsIStringBundleService)
+     .createBundle("chrome://itasanotifier/locale/itasanotifier.properties"),
+ alertsService: Components
+     .classes["@mozilla.org/alerts-service;1"]
+     .getService(Components.interfaces.nsIAlertsService),
+
  alreadyDownloaded: [],
  lastPopupLink: '',
  latest20subs: '',
@@ -60,7 +49,7 @@ var itasanotifier = {
  winAlreadyOpen: '',
 
  periodicallyFetch: function (timer) {
-    this.getDataFrom(url, this.amIInterested, function(status) {
+    this.getDataFrom(itasanotifier.url, this.amIInterested, function(status) {
 	// report error
       }, "titles+links");
   },
@@ -69,7 +58,7 @@ var itasanotifier = {
     
     //  nodes.forEach(function(item){dump(item.toSource());});
 
-    pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
+    itasanotifier.pref_savedseriesarray = eval(itasanotifier.pref.getCharPref('seriesIWatch'));
     var check = false;
     statusbar.tooltipText= "";
 
@@ -85,36 +74,42 @@ var itasanotifier = {
     // compares series you watch (saved in pref_savedseriesarray) against
     // latest 20 subs (nodes)
     // and creates matchingSeries array
-    for(n=0; n < pref_savedseriesarray.length; n++){
-      if (pref_savedseriesarray[n].indexOf("C.S.I") == 0){
-	pref_savedseriesarray[n] = pref_savedseriesarray[n].replace(/C.S.I./i, "CSI:");
-      }
-      for(i=0; i < nodes.length; i++){
-	if(nodes[i].title.indexOf(pref_savedseriesarray[n]) == 0){
-	  // Special check for House mismatching issue
-	  if (pref_savedseriesarray[n] === "House" && nodes[i].title.indexOf("Saddam") != -1 ){
-	  }
-	  else{
-	    check = true;
-	    matches++;
-	    itasanotifier.matchingSeries.push(nodes[i]);
-	    dump("Match found: " + pref_savedseriesarray[n] + " matches " + nodes[i].title + "\n");
-	    tooltip.push(nodes[i]);
-	    toDownload.push(nodes[i]);
+    try{
+      for(n=0; n < itasanotifier.pref_savedseriesarray.length; n++){
+	if (itasanotifier.pref_savedseriesarray[n].indexOf("C.S.I") == 0){
+	  itasanotifier.pref_savedseriesarray[n] = itasanotifier.pref_savedseriesarray[n].replace(/C.S.I./i, "CSI:");
+	}
+	for(i=0; i < nodes.length; i++){
+	  if(nodes[i].title.indexOf(itasanotifier.pref_savedseriesarray[n]) == 0){
+	    // Special check for House mismatching issue
+	    if (itasanotifier.pref_savedseriesarray[n] === "House" && nodes[i].title.indexOf("Saddam") != -1 ){
+	    }
+	    else{
+	      check = true;
+	      matches++;
+	      itasanotifier.matchingSeries.push(nodes[i]);
+	      dump("Match found: " + itasanotifier.pref_savedseriesarray[n] + " matches " + nodes[i].title + "\n");
+	      tooltip.push(nodes[i]);
+	      toDownload.push(nodes[i]);
+	    }
 	  }
 	}
       }
+    }
+    catch (e){
+      alert(itasanotifier.itasaProp.GetStringFromName("itasanotifier.noseries"));
     }
  
     itasanotifier.setTB_label_tooltip(itasanotifier.matchingSeries, check, matches, tooltip );
   },
  
  fetchRSS: function() {
+    dump("Start fetching\n");
     var count = 0;
     var previousFirstElement;
 
     // First call after Firefox launch
-    this.getDataFrom(url, this.amIInterested, function(status) {
+    this.getDataFrom(itasanotifier.url, this.amIInterested, function(status) {
 	// report error
       }, "titles+links");
 
@@ -132,11 +127,11 @@ var itasanotifier = {
  onLoad: function() {
     // Add icon to toolbar on first install
     // Should be replaced with new function suggested by bard
-    var firstInstall = eval(pref.getBoolPref('firstInstall'));
+    var firstInstall = eval(itasanotifier.pref.getBoolPref('firstInstall'));
     if (firstInstall) {
       var toolbar = document.getElementById('nav-bar');
       addToolbarButton('itasanotifier-toolbar-button');
-      pref.setBoolPref('firstInstall', false);
+      itasanotifier.pref.setBoolPref('firstInstall', false);
     }
 
     // initialization code
@@ -147,10 +142,17 @@ var itasanotifier = {
     
     statusbar = document.getElementById('itasa-status-bar');
     
-    pref_savedseriesarray = eval(pref.getCharPref('seriesIWatch'));
+    try{
+      itasanotifier.pref_savedseriesarray = eval(itasanotifier.pref.getCharPref('seriesIWatch'));
+    }
+    catch (e)
+      {
+	alert(itasanotifier.itasaProp.GetStringFromName("itasanotifier.noseries"));
+      }
     
-    var alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
-    if(alreadyDownloaded === undefined) showPopup = true;
+    var alreadyDownloaded = eval(itasanotifier.pref.getCharPref('alreadyDownloaded'));
+    if(alreadyDownloaded === undefined || alreadyDownloaded === "[]" || alreadyDownloaded == "")
+      itasanotifier.showPopup = true;
     
     itasanotifier.fetchRSS();
   },
@@ -178,24 +180,24 @@ var itasanotifier = {
 
  clearStatusBar: function(e) {
     // Reset statusbar label and tooltip text
-    statusbar.label = itasaProp.GetStringFromName("itasanotifier.title");
+    statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
 
     statusbar.tooltipText = itasanotifier.latest20subs;
 
     var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
     itasaStatusPopupDownload.disabled = true;
-    readSubs[0] = true;
+    itasanotifier.readSubs[0] = true;
     
-    pref.setCharPref('alreadyDownloaded', toDownload.toSource());
-    itasanotifier.alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
-    showPopup = false;
+    itasanotifier.pref.setCharPref('alreadyDownloaded', toDownload.toSource());
+    itasanotifier.alreadyDownloaded = eval(itasanotifier.pref.getCharPref('alreadyDownloaded'));
+    itasanotifier.showPopup = false;
   },
 
  stopTimer: function(e) {
     timer.cancel();
     dump("Timer deleted\n");
     statusbar.label = "ItasaNotifier";
-    statusbar.tooltipText = itasaProp.GetStringFromName("itasanotifier.statusbar.updatesStopped");
+    statusbar.tooltipText = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.updatesStopped");
   },
 
  showLatest20Subs: function(e){
@@ -226,11 +228,11 @@ var itasanotifier = {
   
     var lastTitle = lastSub.title;
     var lastLink = lastSub.link;
-
-    if (showPopup === true && lastLink !== itasanotifier.lastPopupLink)
+    //    dump("showPopup is: " + itasanotifier.showPopup + "and lastLink is: " + lastLink + "\n");
+    if (itasanotifier.showPopup === true && lastLink !== itasanotifier.lastPopupLink)
       {
-	alertsService.showAlertNotification("chrome://mozapps/skin/downloads/downloadIcon.png", 
-					    itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub"),
+	itasanotifier.alertsService.showAlertNotification("chrome://mozapps/skin/downloads/downloadIcon.png", 
+					    itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub"),
 					    lastTitle,
 					    true,
 					    lastLink ,
@@ -242,7 +244,7 @@ var itasanotifier = {
  getList: function() {
     var req = new XMLHttpRequest();
     req.overrideMimeType('text/xml');
-    req.open('GET', urlSubs, true);
+    req.open('GET', itasanotifier.urlSubs, true);
 
     req.onreadystatechange = function (aEvt) {
       if (req.readyState == 4) {
@@ -274,7 +276,7 @@ var itasanotifier = {
  
  setTB_label_tooltip: function(l20s_a, check, matches, tt) {
     // Create toolbar label and tooltip
-    var latest20subs = "\n" + itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
+    var latest20subs = "\n" + itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
     for(i=0; i < l20s_a.length; i++){
       latest20subs += l20s_a[i].title + "\n";
     }
@@ -302,13 +304,13 @@ var itasanotifier = {
     // MANY SUBS
     if(check && matches > 1){
       // label looks like: There are N new subs
-      var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
+      var label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.thereAre") + " " +
       + matches
       + " "
-      + itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
+      + itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.newSubs");
 
       // tooltip look like: New subs: <series list>
-      var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + tt2str;
+      var tooltip = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + tt2str;
 
       statusbar.label = label;
       statusbar.tooltipText = tooltip;
@@ -317,8 +319,8 @@ var itasanotifier = {
     // JUST ONE SUB
     else if(check && matches==1){
 
-      var label = itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
-      var tooltip = itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + "\n" + tt2str;
+      var label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
+      var tooltip = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + "\n" + tt2str;
 
       statusbar.label = label;
       statusbar.tooltipText = tooltip;
@@ -326,8 +328,8 @@ var itasanotifier = {
     }
     // NO SUBS
     else {
-      statusbar.label = itasaProp.GetStringFromName("itasanotifier.title");
-      statusbar.tooltipText = latest20subs;
+      statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
+      statusbar.tooltipText = itasanotifier.latest20subs;
     }
   },
 
@@ -335,7 +337,7 @@ var itasanotifier = {
  // based on which series has been marked as already
  // read in a previous session
  purgeList: function(currentSeries) {
-    itasanotifier.alreadyDownloaded = eval(pref.getCharPref('alreadyDownloaded'));
+    itasanotifier.alreadyDownloaded = eval(itasanotifier.pref.getCharPref('alreadyDownloaded'));
 
     var newSeries = [];
     if (itasanotifier.alreadyDownloaded === "[]" || itasanotifier.alreadyDownloaded === undefined){
@@ -372,14 +374,14 @@ var itasanotifier = {
  getDataFrom: function(url, onRetrieve, onError, tag) {
     var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
     .createInstance(Components.interfaces.nsIXMLHttpRequest);
-    req.open("GET", url, true);
+    req.open("GET", itasanotifier.url, true);
     
     req.onreadystatechange = function (aEvt) {
       if (req.readyState == 4) {
 	if(req.status == 200){
 	  var i, n;
 	  var nodeList = [];
-	  var l20Subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
+	  var l20Subs = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
   
 	  switch(tag){
 	  case "titles":
@@ -388,7 +390,7 @@ var itasanotifier = {
 	      nodeList.push(nodes[i].textContent);
 	    }
 	  
-	    var l20Subs = itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
+	    var l20Subs = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.latest20subs") + "\n";
 	    for(i=1; i < nodes.length; i++){
 	      l20Subs += nodes[i].textContent + "\n";
 	    }
@@ -472,6 +474,8 @@ function addToolbarButton(buttonId) {
     });
 }
 // MOZILLA FIREFOX FUNCTION OVERRIDE TO FIX A BUG
+// https://bugzilla.mozilla.org/show_bug.cgi?id=404124
+// http://tinyurl.com/c93sno
 function FillInHTMLTooltip(tipElement)
 {
   var retVal = false;

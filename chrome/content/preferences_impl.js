@@ -91,6 +91,7 @@ inp = {
   
     inp.listHasChanged = document.getElementById('listHasChanged');
     inp.listHasChanged.hidden = false;
+    inp.saveMyList();
   },
 
  removeFromMyList: function() {
@@ -111,6 +112,7 @@ inp = {
 
     var i;
     for(i=0; i < length; i++){
+      dump("myserieslist.getItemAtIndex(i).label is: " + myserieslist.getItemAtIndex(i).label + "\n");
       if(myserieslist.getItemAtIndex(i).label === undefined) alert("myserieslist.getItemAtIndex(i).label is undefined");
       inp.unsavedSeriesArray[i] = myserieslist.getItemAtIndex(i).label;
     }
