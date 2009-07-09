@@ -26,11 +26,13 @@
   
   <script src="overlay.js"/>
   <stringbundleset id="stringbundleset">
-    <stringbundle id="itasanotifier-strings" src="chrome://itasanotifier/locale/itasanotifier.properties"/>
+    <stringbundle id="itasanotifier-strings"
+		  src="chrome://itasanotifier/locale/itasanotifier.properties"/>
   </stringbundleset>
 
   <menupopup id="menu_ToolsPopup">
-    <menuitem id="itasanotifier-hello" label="&itasanotifier.label;"
+    <menuitem id="itasanotifier-hello"
+	      label="&itasanotifier.label;"
 	      oncommand="itasanotifier.onMenuItemCommand(event);"/>
   </menupopup>
   
