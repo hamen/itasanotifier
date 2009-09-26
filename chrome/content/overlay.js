@@ -18,8 +18,10 @@
 */
 
 var itasanotifier = {
- url: 'http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/',
- urlSubs: 'http://www.italiansubs.net/Sottotitoli/',
+  // url: 'http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/',
+ url: 'http://www.italiansubs.net/index.php?option=com_rsssub&type=lastsub',
+ //urlSubs: 'http://www.italiansubs.net/Sottotitoli/',
+ urlSubs: 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=9',
  pref: Components
      .classes["@mozilla.org/preferences-service;1"]
      .getService(Components.interfaces.nsIPrefService)
@@ -160,7 +162,7 @@ var itasanotifier = {
  showContextMenu: function(event) {
     // show or hide the menuitem based on what the context menu is on
     // see http://kb.mozillazine.org/Adding_items_to_menus
-    document.getElementById("context-itasanotifier").hidden = gContextMenu.onImage;
+    //document.getElementById("context-itasanotifier").hidden = gContextMenu.onImage;
   },
  onMenuItemCommand: function(e) {
     // Opens Options Dialog

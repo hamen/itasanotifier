@@ -29,7 +29,8 @@ const prefs = Cc['@mozilla.org/preferences-service;1']
   .getService(Ci.nsIPrefService)
   .getBranch('extensions.itasanotifier.');
 
-const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
+const urlSubs = "http://www.italiansubs.net/index.php?option=com_remository&Itemid=9";
+//const urlSubs = "http://www.italiansubs.net/Sottotitoli/";
 
 var inp = itasanotifierPreferences;
 
