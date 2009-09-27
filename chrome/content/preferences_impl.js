@@ -87,6 +87,10 @@ inp = {
   
     var itemIndex = thelist.selectedIndex;
     var item = thelist.getItemAtIndex(itemIndex);
+
+    var rowcount = myserieslist.getRowCount();
+    myserieslist.ensureIndexIsVisible(rowcount);
+
     if(item.label === undefined) alert("item.label is undefined");
     myserieslist.appendItem(item.label);
   
