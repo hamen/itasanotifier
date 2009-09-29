@@ -35,6 +35,8 @@ const urlSubs = "http://www.italiansubs.net/index.php?option=com_remository&Item
 var inp = itasanotifierPreferences;
 
 inp = {
+ loader : Cc['@mozilla.org/moz/jssubscript-loader;1'].getService(Ci.mozIJSSubScriptLoader),
+ utils : {},
  initList: '',
  listHasChanged: '',
  pref_savedseriesarray: '',
@@ -123,7 +125,9 @@ inp = {
     }
     inp.unsavedSeriesArray.sort();
 
-    inp.pref_savedseriesarray = inp.unsavedSeriesArray.toSource();
+    //inp.pref_savedseriesarray = inp.unsavedSeriesArray.toSource();
+    inp.pref_savedseriesarray = inp.utils.getJSON().stringify(inp.unsavedSeriesArray);
+
     prefs.setCharPref('seriesIWatch', inp.pref_savedseriesarray);
     inp.listHasChanged = document.getElementById('listHasChanged');
     inp.listHasChanged.hidden = true;
@@ -176,20 +180,23 @@ inp = {
   },
 
  appendToList: function(element, index, array) {
-  // alert("[" + index + "] is " + element);
-  inp.initList.appendItem(element, element);
+    // alert("[" + index + "] is " + element);
+    inp.initList.appendItem(element, element);
   },
 
  printElt: function(element, index, array) {
-     print("[" + index + "] is " + element); // assumes print is already defined
+    print("[" + index + "] is " + element); // assumes print is already defined
   },
  
  init: function() {
+    inp.loader.loadSubScript('chrome://itasanotifier/content/util_impl.js', inp.utils);
     window.sizeToContent();
     
-    inp.pref_savedseriesarray = eval(prefs.getCharPref('seriesIWatch'));
-    //pref_savedserieNidsarray = eval(prefs.getCharPref('seriesIWatch_nameNid'));
+    //inp.pref_savedseriesarray = eval(prefs.getCharPref('seriesIWatch'));
+    inp.pref_savedseriesarray = inp.utils.getJSON().parse(prefs.getCharPref('seriesIWatch'));
 
+    //pref_savedserieNidsarray = eval(prefs.getCharPref('seriesIWatch_nameNid'));
+    
     inp.initList = document.getElementById('myserieslist');   
     inp.pref_savedseriesarray.forEach(inp.appendToList);
   }
