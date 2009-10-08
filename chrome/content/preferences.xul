@@ -28,9 +28,9 @@
 	    onpaneload="itasanotifierPreferences.inp.init()"
 	    label="&pane1.title;">
    
-    <hbox> <!-- hbox contains 2 vbox elements-->
-      <vbox>
-	<!-- Left vbox contains 3 elements-->
+    <hbox> <!-- hbox contains 3 vbox elements-->
+      <vbox flex="1">
+	<!-- Left vbox contains 4 elements-->
 
 	<label value="&thelist.label;" />
 	<listbox id="thelist">
@@ -39,7 +39,18 @@
 	<button label="&getlistButton.label;"
 	    oncommand="itasanotifierPreferences.inp.getList()"/>
       </vbox>
-      
+      <vbox>
+	<label value="&seriesIWatch.format;" />
+	<menulist id="subFormatsList" label="HDTV">
+	  <menupopup>
+	    <menuitem label="HDTV" selected="true"/>
+	    <menuitem label="720p"/>
+	    <menuitem label="Hr"/>
+	    <menuitem label="Bluray"/>
+	    <menuitem label="DVDRip"/>
+	  </menupopup>
+	</menulist>
+      </vbox>
       <!-- Central vbox contains 2 buttons-->
       <vbox>
 	<spacer flex="1" />
@@ -49,21 +60,21 @@
 	    oncommand="itasanotifierPreferences.inp.removeFromMyList()"/>
 	<spacer flex="1" />
       </vbox>
+
       
-      <vbox>
+      <vbox flex="1">
 	<!-- Right vbox contains 2 elements-->
 	<label value="&seriesIWatch.label;" />
       <listbox id="myserieslist">
       </listbox>
-      <button label="&saveMyListButton.label;"
-	    oncommand="itasanotifierPreferences.inp.saveMyList()"/>
+      </vbox>
+    </hbox>
+    <hbox>
       <label id="listHasChanged"
 	     hidden="true"
 	     flex="1"
 	     value="&listHasChanged.label;" />
-      </vbox>
     </hbox>
-    
     <!-- TEST BUTTON
     <button label="Name N Ids" 
 	    oncommand="itasanotifierPreferences.getNamesNIds()"/>

@@ -61,13 +61,14 @@ var itasanotifier = {
     
     amIInterested: function(nodes) {
 	
-	//  nodes.forEach(function(item){dump(item.toSource());});
 	try {
-	    itasanotifier.pref_savedseriesarray = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('seriesIWatch'));
-	    //itasanotifier.pref_savedseriesarray = eval(itasanotifier.pref.getCharPref('seriesIWatch'));
+	    itasanotifier.pref_savedseriesarray 
+		= itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('seriesIWatch'));
 	}
-	catch (e) {//(e if e.message == "JSON.parse") {
-	    alert ("error name is: " + e.name + " and error message is: " + e.message + " 70");
+	catch (e) {
+	    dump("Error message is: " + e.message + " (amIInterested:69)\n");
+	    dump("Resetting seriesIWatch\n");
+	    itasanotifier.pref.setCharPref('seriesIWatch', "empty");
 	}
 	
 	var check = false;
@@ -81,35 +82,99 @@ var itasanotifier = {
 	readSubs[0] = false;
 	
 	toDownload = [];
+	
+	var tvseries = {
+	    title: '',
+	    format: ''
+	};
+	
+	function formatMatch(tvseries, node){
+	    if (node.title.indexOf(tvseries.format) != "-1") return true;
+	};
 
 	// compares series you watch (saved in pref_savedseriesarray) against
 	// latest 20 subs (nodes)
 	// and creates matchingSeries array
 	try{
 	    for(n=0; n < itasanotifier.pref_savedseriesarray.length; n++){
-		if (itasanotifier.pref_savedseriesarray[n].indexOf("C.S.I") == 0){
-		    itasanotifier.pref_savedseriesarray[n] = itasanotifier.pref_savedseriesarray[n].replace(/C.S.I./i, "CSI:");
+		if (itasanotifier.pref_savedseriesarray[n].title.indexOf("C.S.I") == 0){
+		    itasanotifier.pref_savedseriesarray[n]
+			= itasanotifier.pref_savedseriesarray[n].title.replace(/C.S.I./i, "CSI:");
 		}
 		for(i=0; i < nodes.length; i++){
-		    if(nodes[i].title.indexOf(itasanotifier.pref_savedseriesarray[n]) == 0){
+		    /*
+		    dump("itasanotifier.pref_savedseriesarray is: " 
+			+ itasanotifier.pref_savedseriesarray[n].toSource() 
+			+ "node is: " + nodes[i].toSource() + "\n");
+		    */
+		    if(nodes[i].title.indexOf(itasanotifier.pref_savedseriesarray[n].title) == 0){
 			// Special check for House mismatching issue
-			if (itasanotifier.pref_savedseriesarray[n] === "House" && nodes[i].title.indexOf("Saddam") != -1 ){
+			if (itasanotifier.pref_savedseriesarray[n].title 
+			    === "House" && nodes[i].title.indexOf("Saddam") != -1 ){
 			}
 			else{
-			    check = true;
-			    matches++;
-			    itasanotifier.matchingSeries.push(nodes[i]);
-			    dump("Match found: " + itasanotifier.pref_savedseriesarray[n] + " matches " + nodes[i].title + "\n");
-			    tooltip.push(nodes[i]);
-			    toDownload.push(nodes[i]);
+			    var regexBluray = /(Bluray)/;
+			    var regex720p = /(720p)/;
+			    var regexDVDRip = /(DVDRip)/;
+			    var regexHR = /(HR)/;
+
+			    function rssFormat() {
+				var format = '';
+
+				var match = nodes[i].title.search(/(720p)/);
+				if (match != -1)
+				    format = "720p";
+				
+				var match = nodes[i].title.search(/(Bluray)/);
+				if (match != -1)
+				    format = "Bluray";
+				
+				var match = nodes[i].title.search(/(DVDRip)/);
+				if (match != -1)
+				    format = "DVDRip";
+
+				var match = nodes[i].title.search(/(HR)/);
+				if (match != -1)
+				    format = "HR";
+				
+				if (format === '') format = "HDTV";
+				
+				return format;
+			    }
+			    
+			    nodes[i].format = rssFormat();
+			    			    
+			    if (nodes[i].format === itasanotifier.pref_savedseriesarray[n].format)
+			    {
+				check = true;
+				matches++;
+				itasanotifier.matchingSeries.push(nodes[i]);
+				dump("Match found: " + itasanotifier.pref_savedseriesarray[n].title +
+				     " matches " + nodes[i].title + "\n");
+				tooltip.push(nodes[i]);
+				toDownload.push(nodes[i]);
+			    }
+			    /*
+			    if (nodes[i].title.indexOf(itasanotifier.pref_savedseriesarray[n].format) != "-1"){
+				check = true;
+				matches++;
+				itasanotifier.matchingSeries.push(nodes[i]);
+				dump("Match found: " + itasanotifier.pref_savedseriesarray[n].title +
+				     " matches " + nodes[i].title + "\n");
+				tooltip.push(nodes[i]);
+				toDownload.push(nodes[i]);
+			    }
+			    */
 			}
 		    }
 		}
 	    }
 	}
 	catch (e){
-	    //alert ("error name is: " + e.name + " and error message is: " + e.message + " 112");
-	    alert(itasanotifier.itasaProp.GetStringFromName("itasanotifier.noseries") + "\nLine is: 112");
+	    dump("error name is: " + e.name + " and error message is: " + e.message + " (amIInterested:112)\n");
+	    // Old list format: reset list. Advise user "he/she can select tvseries format now!".
+	    itasanotifier.pref.setCharPref('seriesIWatch', "empty");
+	    alert(inp.itasaProp.GetStringFromName("itasanotifier.noseries"));
 	}
 	
 	itasanotifier.setTB_label_tooltip(itasanotifier.matchingSeries, check, matches, tooltip );
@@ -142,7 +207,6 @@ var itasanotifier = {
 	// Add icon to toolbar on first install
 	// Should be replaced with new function suggested by bard
 	
-	//var firstInstall = eval(itasanotifier.pref.getBoolPref('firstInstall'));
 	var firstInstall = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getBoolPref('firstInstall'));
 	if (firstInstall) {
 	    var toolbar = document.getElementById('nav-bar');
@@ -167,7 +231,9 @@ var itasanotifier = {
 	    	    
 	}
 	catch (e) {
-	    alert(itasanotifier.itasaProp.GetStringFromName("itasanotifier.noseries") + "\nLine is 183");
+	    dump(itasanotifier.itasaProp.GetStringFromName("itasanotifier.noseries") 
+		 + "\n itasanotifier.pref_savedseriesarray is: " + itasanotifier.pref_savedseriesarray 
+		 + "\nLine is 183\n");
 	}
 	
 	try {
@@ -273,12 +339,14 @@ var itasanotifier = {
 	//    dump("showPopup is: " + itasanotifier.showPopup + "and lastLink is: " + lastLink + "\n");
 	if (itasanotifier.showPopup === true && lastLink !== itasanotifier.lastPopupLink)
 	{
-	    itasanotifier.alertsService.showAlertNotification("chrome://mozapps/skin/downloads/downloadIcon.png", 
-							      itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub"),
-							      lastTitle,
-							      true,
-							      lastLink ,
-							      listener);
+	    itasanotifier.alertsService
+		.showAlertNotification("chrome://mozapps/skin/downloads/downloadIcon.png", 
+				       itasanotifier.itasaProp
+				       .GetStringFromName("itasanotifier.statusbar.yourSub"),
+				       lastTitle,
+				       true,
+				       lastLink ,
+				       listener);
 	    itasanotifier.lastPopupLink = lastLink;
 	}
     },

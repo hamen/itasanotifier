@@ -42,9 +42,17 @@ inp = {
  pref_savedseriesarray: '',
  seriesarray: new Array(),
  unsavedSeriesArray: new Array(),
+    itasaProp: Components
+	.classes["@mozilla.org/intl/stringbundle;1"]
+	.getService(Components.interfaces.nsIStringBundleService)
+	.createBundle("chrome://itasanotifier/locale/itasanotifier.properties"),
 
- getList: function() {
- 
+    getList: function() {
+	var tvseries = {
+	 title: '',
+	 format: ''
+     };
+
     var req = new XMLHttpRequest();
     req.overrideMimeType('text/xml');
     req.open('GET', urlSubs, true);
@@ -68,7 +76,11 @@ inp = {
 	    matches_array[i] = temp;
 	    temp = matches_array[i].replace('</a>', "", "gi");
 	    series[i]= temp;
-	    inp.seriesarray[i] = temp;
+	      var tvseries = {
+		  title: temp,
+		  format: ''
+	      }
+	      inp.seriesarray[i] = tvseries;
 	    //dump(seriesarray[i] + "\n");
 	  }
 	}
@@ -84,54 +96,69 @@ inp = {
   },
 
  addToMyList: function() {
-    var thelist = document.getElementById('thelist');
-    var myserieslist = document.getElementById('myserieslist');
-  
-    var itemIndex = thelist.selectedIndex;
-    var item = thelist.getItemAtIndex(itemIndex);
+     // thelist is italiansubs.net tv series list
+     var thelist = document.getElementById('thelist');
+     // myserieslist is my owntv series list
+     var myserieslist = document.getElementById('myserieslist');
+     // subFormatsList is a collection of formats subs could be released in
+     var subFormatsList = document.getElementById('subFormatsList');
+     
+     // item is the current tv series I am selection in thelist
+     var itemIndex = thelist.selectedIndex;
+     var item = thelist.getItemAtIndex(itemIndex);
 
-    var rowcount = myserieslist.getRowCount();
-    myserieslist.ensureIndexIsVisible(rowcount);
+     var formatIndex = subFormatsList.selectedIndex;
+     var format = subFormatsList.getItemAtIndex(formatIndex);
 
-    if(item.label === undefined) alert("item.label is undefined");
-    myserieslist.appendItem(item.label);
-  
-    inp.listHasChanged = document.getElementById('listHasChanged');
-    inp.listHasChanged.hidden = false;
-    inp.saveMyList();
-  },
+     var rowcount = myserieslist.getRowCount();
+     myserieslist.ensureIndexIsVisible(rowcount);
 
- removeFromMyList: function() {
-    var myserieslist = document.getElementById('myserieslist');
+     var tvseries = {
+	 title: item.label,
+	 format: format.label
+     };
 
-    if(myserieslist.selectedIndex == -1){
-      return; // no item selected so return
-    }else{
-      myserieslist.removeItemAt(myserieslist.selectedIndex);
-      inp.listHasChanged = document.getElementById('listHasChanged');
-      inp.listHasChanged.hidden = false;
-    }
-  },
+     if(tvseries.title === undefined)
+	 dump("tvseries title is undefined (addToMyList:122)");
+     myserieslist.appendItem(tvseries.title + " (" + tvseries.format + ")");
+     
+     var lastItem = myserieslist.itemCount - 1;
+     var myStoredList = new Array;
 
- saveMyList: function() {
-    var myserieslist = document.getElementById('myserieslist');
-    var length = myserieslist.itemCount
+     try {
+	 myStoredList = inp.utils.getJSON().parse(prefs.getCharPref('seriesIWatch'));
+     }
+     catch (e if e.message == "JSON.parse"){
+	 dump("myStoredList is empty or corrupted. Resetting...\n");
+	 prefs.setCharPref('seriesIWatch', "empty");
+     }
 
-    var i;
-    for(i=0; i < length; i++){
-      dump("myserieslist.getItemAtIndex(i).label is: " + myserieslist.getItemAtIndex(i).label + "\n");
-      if(myserieslist.getItemAtIndex(i).label === undefined) alert("myserieslist.getItemAtIndex(i).label is undefined");
-      inp.unsavedSeriesArray[i] = myserieslist.getItemAtIndex(i).label;
-    }
-    inp.unsavedSeriesArray.sort();
+     myStoredList.push(tvseries);
+     myStoredList.sort();
+     prefs.setCharPref('seriesIWatch', inp.utils.getJSON().stringify(myStoredList));
+ },
 
-    //inp.pref_savedseriesarray = inp.unsavedSeriesArray.toSource();
-    inp.pref_savedseriesarray = inp.utils.getJSON().stringify(inp.unsavedSeriesArray);
+    removeFromMyList: function() {
+	var myserieslist = document.getElementById('myserieslist');
+	var itemToRemove = myserieslist.getItemAtIndex(myserieslist.selectedIndex).label;
+	var myStoredList = inp.utils.getJSON().parse(prefs.getCharPref('seriesIWatch'));
 
-    prefs.setCharPref('seriesIWatch', inp.pref_savedseriesarray);
-    inp.listHasChanged = document.getElementById('listHasChanged');
-    inp.listHasChanged.hidden = true;
-  },
+	if(myserieslist.selectedIndex == -1){
+	    return; // no item selected so return
+	}
+	else{
+	    // Remove item from listbox
+	    myserieslist.removeItemAt(myserieslist.selectedIndex);
+	    // Compare selected listbox item with seriesIWatch titles
+	    // Remove matching series
+	    myStoredList.forEach(function (element, index, array) {
+		if (itemToRemove.indexOf(element.title) != -1){
+		    var removed = myStoredList.splice(index, 1);
+		    }
+	    });
+	    prefs.setCharPref('seriesIWatch', inp.utils.getJSON().stringify(myStoredList));
+	}
+    },
 
  getNamesNIds: function() {
     var req = new XMLHttpRequest();
@@ -180,8 +207,14 @@ inp = {
   },
 
  appendToList: function(element, index, array) {
-    // alert("[" + index + "] is " + element);
-    inp.initList.appendItem(element, element);
+     if (element.title === undefined && element.format === undefined){
+	 inp.listHasChanged = document.getElementById('listHasChanged');
+	 inp.listHasChanged.hidden = false;
+     }     
+     else if (element.format != '')
+	 inp.initList.appendItem(element.title + " (" + element.format + ")", element);
+     else
+	 inp.initList.appendItem(element.title, element);
   },
 
  printElt: function(element, index, array) {
@@ -191,13 +224,21 @@ inp = {
  init: function() {
     inp.loader.loadSubScript('chrome://itasanotifier/content/util_impl.js', inp.utils);
     window.sizeToContent();
-    
-    //inp.pref_savedseriesarray = eval(prefs.getCharPref('seriesIWatch'));
-    inp.pref_savedseriesarray = inp.utils.getJSON().parse(prefs.getCharPref('seriesIWatch'));
-
-    //pref_savedserieNidsarray = eval(prefs.getCharPref('seriesIWatch_nameNid'));
-    
-    inp.initList = document.getElementById('myserieslist');   
-    inp.pref_savedseriesarray.forEach(inp.appendToList);
+     
+     inp.initList = document.getElementById('myserieslist');
+     
+     try {
+	 inp.pref_savedseriesarray = inp.utils.getJSON().parse(prefs.getCharPref('seriesIWatch'));
+	 inp.pref_savedseriesarray.forEach(inp.appendToList);
+     }
+     catch (e if e.message == "JSON.parse") {
+	 dump("JSON.parse in preferences_impl at line 111\n");
+	 dump("myStoredList is empty or corrupted. Resetting...\n");
+	 prefs.setCharPref('seriesIWatch', "empty");
+     }
+     catch (e if e.message == "inp.pref_savedseriesarray.forEach is not a function" 
+	    || inp.pref_savedseriesarray == "empty") {
+	 alert(inp.itasaProp.GetStringFromName("itasanotifier.noseries"));
+     }
   }
 }

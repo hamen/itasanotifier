@@ -3,8 +3,10 @@
 <!ENTITY getlistButton.label "Aggiorna lista">
 <!ENTITY thelist.label "Serie TV presenti su ItaSa">
 <!ENTITY seriesIWatch.label "Serie TV che seguo">
+<!ENTITY seriesIWatch.format "Formato sottotitolo">
 <!ENTITY addToMyListButton.label "Aggiungi">
 <!ENTITY removeFromMyListButton.label "Rimuovi">
 <!ENTITY saveMyListButton.label "Salva">
-<!ENTITY listHasChanged.label "Ricorda di salvare le modifiche">
+<!ENTITY listHasChanged.label "Puoi scegliere il formato delle serie!
+			       Ricrea la tua lista!">
 

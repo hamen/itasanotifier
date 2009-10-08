@@ -3,8 +3,10 @@
 <!ENTITY getlistButton.label "Update list">
 <!ENTITY thelist.label "Itasa TV Series">
 <!ENTITY seriesIWatch.label "TV Series I watch">
+<!ENTITY seriesIWatch.format "Sub format">
 <!ENTITY addToMyListButton.label "Add">
 <!ENTITY removeFromMyListButton.label "Remove">
 <!ENTITY saveMyListButton.label "Save">
-<!ENTITY listHasChanged.label "Save before exit ;)">
+<!ENTITY listHasChanged.label 
+"You can select series format now! Create your new list!">
 
