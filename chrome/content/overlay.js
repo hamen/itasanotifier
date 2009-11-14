@@ -153,18 +153,9 @@ var itasanotifier = {
 				     " matches " + nodes[i].title + "\n");
 				tooltip.push(nodes[i]);
 				toDownload.push(nodes[i]);
+				
 			    }
-			    /*
-			    if (nodes[i].title.indexOf(itasanotifier.pref_savedseriesarray[n].format) != "-1"){
-				check = true;
-				matches++;
-				itasanotifier.matchingSeries.push(nodes[i]);
-				dump("Match found: " + itasanotifier.pref_savedseriesarray[n].title +
-				     " matches " + nodes[i].title + "\n");
-				tooltip.push(nodes[i]);
-				toDownload.push(nodes[i]);
-			    }
-			    */
+			    
 			}
 		    }
 		}
@@ -296,7 +287,6 @@ var itasanotifier = {
 	var toDownloadJSON = itasanotifier.utils.getJSON().stringify(toDownload);
 	itasanotifier.pref.setCharPref('alreadyDownloaded', toDownloadJSON);
 	
-	//itasanotifier.alreadyDownloaded = eval(itasanotifier.pref.getCharPref('alreadyDownloaded'));
 	itasanotifier.alreadyDownloaded = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('alreadyDownloaded'));
 	itasanotifier.showPopup = false;
     },
