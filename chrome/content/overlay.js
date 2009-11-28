@@ -232,17 +232,23 @@ var itasanotifier = {
 	}
 	catch (e)
 	{
-	    var rawSeries = itasanotifier.pref.getCharPref('seriesIWatch');
-	    var rawAlready = itasanotifier.pref.getCharPref('alreadyDownloaded');
-	    /* alert ("error name is: " + e.name
-		   + " and error message is: " + e.message
-		   + "\nLine is: 170 \nSeriesRAW is: "
-		   + rawSeries + "\nAlreadyDownloadedRAW is: " + rawAlready);
-		   */
-	    
-	    // Cannot handle old non-json alreadyDownloaded list
-	    // Reset it
-	    alreadyDownloaded = "[]";
+	    try {
+		var rawSeries = itasanotifier.pref.getCharPref('seriesIWatch');
+		var rawAlready = itasanotifier.pref.getCharPref('alreadyDownloaded');
+		/* alert ("error name is: " + e.name
+				   + " and error message is: " + e.message
+				   		   + "\nLine is: 170 \nSeriesRAW is: "
+						   		   + rawSeries + "\nAlreadyDownloadedRAW is: " + rawAlready);
+								   		   */
+		
+		// Cannot handle old non-json alreadyDownloaded list
+		// Reset it
+		alreadyDownloaded = "[]";
+	    }
+	    catch (e) {
+		itasanotifier.pref.setCharPref('seriesIWatch', "");
+		itasanotifier.pref.setCharPref('alreadyDownloaded', "");
+	    }
 	}
 	
 	if(alreadyDownloaded === undefined || alreadyDownloaded === "[]" || alreadyDownloaded == "")
