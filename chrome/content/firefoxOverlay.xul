@@ -26,11 +26,13 @@
   
   <script src="overlay.js"/>
   <stringbundleset id="stringbundleset">
-    <stringbundle id="itasanotifier-strings" src="chrome://itasanotifier/locale/itasanotifier.properties"/>
+    <stringbundle id="itasanotifier-strings"
+		  src="chrome://itasanotifier/locale/itasanotifier.properties"/>
   </stringbundleset>
 
   <menupopup id="menu_ToolsPopup">
-    <menuitem id="itasanotifier-hello" label="&itasanotifier.label;"
+    <menuitem id="itasanotifier-hello"
+	      label="&itasanotifier.label;"
 	      oncommand="itasanotifier.onMenuItemCommand(event);"/>
   </menupopup>
   
@@ -66,7 +68,7 @@
 			oncommand="itasanotifier.showLatest20Subs()"/>
 
               <menuitem label="&itasa-status-popup.start;"
-			oncommand="fetchRSS()"/>
+			oncommand="itasanotifier.fetchRSS()"/>
 			
 	      <menuitem label="&itasa-status-popup.stop;"
 			oncommand="itasanotifier.stopTimer()"/>
