@@ -283,14 +283,12 @@ var itasanotifier = {
     clearStatusBar: function(e) {
 	// Reset statusbar label and tooltip text
 	statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
-
 	statusbar.tooltipText = itasanotifier.latest20subs;
 
+	// Disable "Go to download page" menu item
 	var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
 	itasaStatusPopupDownload.disabled = true;
 	itasanotifier.readSubs[0] = true;
-	
-	//itasanotifier.pref.setCharPref('alreadyDownloaded', toDownload.toSource());
 	
 	var toDownloadJSON = itasanotifier.utils.getJSON().stringify(toDownload);
 	itasanotifier.pref.setCharPref('alreadyDownloaded', toDownloadJSON);
@@ -311,8 +309,13 @@ var itasanotifier = {
     },
 
     downloadSubs: function(e) {
-	var i;
-	for(i=0; i < toDownload.length; i++){
+	// toDownload is an array equal to alreadyDownloaded + new not downloaded subs
+	// Fetch alreadyDownloaded from prefs and use its length as starting index
+	// for toDownload cycle. In this way, we avoid to re-download old subs.
+
+	var alreadyDownloaded = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('alreadyDownloaded'));
+	
+	for(var i=alreadyDownloaded.length; i < toDownload.length; i++){
 	    gBrowser.addTab(toDownload[i].link);
 	    gBrowser.selectedTab = gBrowser.newTab;
 	}
