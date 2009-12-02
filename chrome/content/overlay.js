@@ -21,9 +21,7 @@ var itasanotifier = {
     loader : Cc['@mozilla.org/moz/jssubscript-loader;1'].getService(Ci.mozIJSSubScriptLoader),
     utils : {},
     
-    // url: 'http://www.italiansubs.net/Abbonati-ai-feed-RSS/FRONTPAGE/',
     url: 'http://www.italiansubs.net/index.php?option=com_rsssub&type=lastsub',
-    //urlSubs: 'http://www.italiansubs.net/Sottotitoli/',
     urlSubs: 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=9',
     pref: Components
 	.classes["@mozilla.org/preferences-service;1"]
@@ -111,6 +109,10 @@ var itasanotifier = {
 			// Special check for House mismatching issue
 			if (itasanotifier.pref_savedseriesarray[n].title 
 			    === "House" && nodes[i].title.indexOf("Saddam") != -1 ){
+			}
+			// Special check for Heroes mismatching issue
+			else if (itasanotifier.pref_savedseriesarray[n].title 
+				 === "Heroes" && nodes[i].title.indexOf("Novel") != -1 ){
 			}
 			else{
 			    var regexBluray = /(Bluray)/;
