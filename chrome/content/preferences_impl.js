@@ -98,12 +98,12 @@ inp = {
  addToMyList: function() {
      // thelist is italiansubs.net tv series list
      var thelist = document.getElementById('thelist');
-     // myserieslist is my owntv series list
+     // myserieslist is my own tv series list
      var myserieslist = document.getElementById('myserieslist');
      // subFormatsList is a collection of formats subs could be released in
      var subFormatsList = document.getElementById('subFormatsList');
      
-     // item is the current tv series I am selection in thelist
+     // item is the current tv series I am selecting in thelist
      var itemIndex = thelist.selectedIndex;
      var item = thelist.getItemAtIndex(itemIndex);
 
@@ -118,8 +118,9 @@ inp = {
 	 format: format.label
      };
 
-     if(tvseries.title === undefined)
+     if(tvseries.title === undefined) {
 	 dump("tvseries title is undefined (addToMyList:122)");
+     }
      myserieslist.appendItem(tvseries.title + " (" + tvseries.format + ")");
      
      var lastItem = myserieslist.itemCount - 1;
@@ -134,7 +135,9 @@ inp = {
      }
 
      myStoredList.push(tvseries);
-     myStoredList.sort();
+     
+     myStoredList.sort(inp.sort_by('title', false, function(a){return a.toUpperCase()}));
+
      prefs.setCharPref('seriesIWatch', inp.utils.getJSON().stringify(myStoredList));
  },
 
@@ -206,39 +209,63 @@ inp = {
     req.send(null);
   },
 
- appendToList: function(element, index, array) {
-     if (element.title === undefined && element.format === undefined){
-	 inp.listHasChanged = document.getElementById('listHasChanged');
-	 inp.listHasChanged.hidden = false;
-     }     
-     else if (element.format != '')
-	 inp.initList.appendItem(element.title + " (" + element.format + ")", element);
-     else
-	 inp.initList.appendItem(element.title, element);
-  },
+    appendToList: function(element, index, array) {
+	if (element.title === undefined && element.format === undefined){
+	    inp.listHasChanged = document.getElementById('listHasChanged');
+	    inp.listHasChanged.hidden = false;
+	}     
+	else if (element.format != '')
+	{
+	    inp.initList.appendItem(element.title + " (" + element.format + ")", element);
+	}
+	else
+	{
+	    inp.initList.appendItem(element.title, element);
+	}
+   },
 
- printElt: function(element, index, array) {
-    print("[" + index + "] is " + element); // assumes print is already defined
-  },
- 
- init: function() {
-    inp.loader.loadSubScript('chrome://itasanotifier/content/util_impl.js', inp.utils);
-    window.sizeToContent();
-     
-     inp.initList = document.getElementById('myserieslist');
-     
-     try {
-	 inp.pref_savedseriesarray = inp.utils.getJSON().parse(prefs.getCharPref('seriesIWatch'));
-	 inp.pref_savedseriesarray.forEach(inp.appendToList);
-     }
-     catch (e if e.message == "JSON.parse") {
-	 dump("JSON.parse in preferences_impl at line 111\n");
-	 dump("myStoredList is empty or corrupted. Resetting...\n");
-	 prefs.setCharPref('seriesIWatch', "empty");
-     }
-     catch (e if e.message == "inp.pref_savedseriesarray.forEach is not a function" 
-	    || inp.pref_savedseriesarray == "empty") {
-	 alert(inp.itasaProp.GetStringFromName("itasanotifier.noseries"));
-     }
-  }
+    printElt: function(element, index, array) {
+	print("[" + index + "] is " + element); // assumes print is already defined
+    },
+    
+    sort_by: function(field, reverse, primer){
+	
+	reverse = (reverse) ? -1 : 1;
+	
+	return function(a,b){
+	    
+	    a = a[field];
+	    b = b[field];
+	    
+	    if (typeof(primer) != 'undefined'){
+		a = primer(a);
+		b = primer(b);
+	    }
+	    
+	    if (a<b) return reverse * -1;
+	    if (a>b) return reverse * 1;
+	    return 0;
+	    
+	}
+    },
+
+    init: function() {
+	inp.loader.loadSubScript('chrome://itasanotifier/content/util_impl.js', inp.utils);
+	window.sizeToContent();
+
+	inp.initList = document.getElementById('myserieslist');
+	try {
+	    inp.pref_savedseriesarray = inp.utils.getJSON().parse(prefs.getCharPref('seriesIWatch'));
+	    inp.pref_savedseriesarray.forEach(inp.appendToList);
+	}
+	catch (e if e.message == "JSON.parse") {
+	    dump("JSON.parse in preferences_impl at line 111\n");
+	    dump("myStoredList is empty or corrupted. Resetting...\n");
+	    prefs.setCharPref('seriesIWatch', "empty");
+	}
+	catch (e if e.message == "inp.pref_savedseriesarray.forEach is not a function" 
+	       || inp.pref_savedseriesarray == "empty") {
+	    alert(inp.itasaProp.GetStringFromName("itasanotifier.noseries"));
+	}
+    }
 }
