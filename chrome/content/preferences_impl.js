@@ -111,7 +111,7 @@ inp = {
      var format = subFormatsList.getItemAtIndex(formatIndex);
 
      var rowcount = myserieslist.getRowCount();
-     myserieslist.ensureIndexIsVisible(rowcount);
+     myserieslist.ensureIndexIsVisible(rowcount-1);
 
      var tvseries = {
 	 title: item.label,
