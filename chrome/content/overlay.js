@@ -50,7 +50,40 @@ var itasanotifier = {
     titles: '',
     toDownload: [],
     winAlreadyOpen: '',
-
+    
+    addToolbarButton: function (buttonId) {
+	this.modifyToolbarButtons(function(set) {
+				      if(set.indexOf(buttonId) == -1) {
+					  return set.replace(/(urlbar-container|separator)/,
+							     buttonId + ',$1');
+				      }
+				      else {
+					  return null;
+				      }
+				  });
+    },
+    
+    modifyToolbarButtons: function (modifier) {
+	var toolbar =
+	    document.getElementById('nav-bar') ||
+	    document.getElementById('mail-bar') ||
+	    document.getElementById('mail-bar2');
+	
+	if(!toolbar)
+	    return;
+	
+	if(toolbar.getAttribute('customizable') == 'true') {
+	    var newSet = modifier(toolbar.currentSet);
+	    if(!newSet)
+		return;
+	    
+	    toolbar.currentSet = newSet;
+	    toolbar.setAttribute('currentset', toolbar.currentSet);
+	    toolbar.ownerDocument.persist(toolbar.id, 'currentset');
+	    try { BrowserToolboxCustomizeDone(true); } catch (e) {}
+	}
+    },
+    
     periodicallyFetch: function (timer) {
 	this.getDataFrom(itasanotifier.url, this.amIInterested, function(status) {
 	    // report error
@@ -70,7 +103,7 @@ var itasanotifier = {
 	}
 	
 	var check = false;
-	statusbar.tooltipText= "";
+	this.statusbar.tooltipText= "";
 
 	var tooltip = [];
 	var i, n, matches = 0;
@@ -79,7 +112,7 @@ var itasanotifier = {
 	var readSubs = [];
 	readSubs[0] = false;
 	
-	toDownload = [];
+	this.toDownload = [];
 	
 	var tvseries = {
 	    title: '',
@@ -186,12 +219,13 @@ var itasanotifier = {
 	// Event called periodically using the timer
 	var event
 	    = { notify: function(timer){
-		itasanotifier.periodicallyFetch(timer); 
-	    } }
-
+		    itasanotifier.periodicallyFetch(timer); 
+		}
+	      };
+	
 	// creates the timer
-	timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
-	timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
+	this.timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
+	this.timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
     },
     
     onLoad: function() {
@@ -203,7 +237,7 @@ var itasanotifier = {
 	var firstInstall = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getBoolPref('firstInstall'));
 	if (firstInstall) {
 	    var toolbar = document.getElementById('nav-bar');
-	    addToolbarButton('itasanotifier-toolbar-button');
+	    itasanotifier.addToolbarButton('itasanotifier-toolbar-button');
 	    itasanotifier.pref.setBoolPref('firstInstall', false);
 	}
 
@@ -213,7 +247,7 @@ var itasanotifier = {
 	document.getElementById("contentAreaContextMenu")
 	    .addEventListener("popupshowing", function(e) { itasanotifier.showContextMenu(e); }, false);
 	
-	statusbar = document.getElementById('itasa-status-bar');
+	this.statusbar = document.getElementById('itasa-status-bar');
 
 	var alreadyDownloaded;
 
@@ -282,8 +316,8 @@ var itasanotifier = {
 
     clearStatusBar: function(e) {
 	// Reset statusbar label and tooltip text
-	statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
-	statusbar.tooltipText = itasanotifier.latest20subs;
+	this.statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
+	this.statusbar.tooltipText = itasanotifier.latest20subs;
 
 	// Disable "Go to download page" menu item
 	var itasaStatusPopupDownload = document.getElementById("itasa-status-popup-download");
@@ -300,8 +334,8 @@ var itasanotifier = {
     stopTimer: function(e) {
 	timer.cancel();
 	dump("Timer deleted\n");
-	statusbar.label = "ItasaNotifier";
-	statusbar.tooltipText = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.updatesStopped");
+	this.statusbar.label = "ItasaNotifier";
+	this.statusbar.tooltipText = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.updatesStopped");
     },
 
     showLatest20Subs: function(e){
@@ -333,7 +367,7 @@ var itasanotifier = {
 		}
 		else if (topic === "alertfinished") itasanotifier.lastPopupLink = data;
 	    }
-	}
+	};
 	
 	var lastTitle = lastSub.title;
 	var lastLink = lastSub.link;
@@ -423,8 +457,8 @@ var itasanotifier = {
 	    // tooltip look like: New subs: <series list>
 	    var tooltip = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.yourSubs")+ "\n" + tt2str;
 
-	    statusbar.label = label;
-	    statusbar.tooltipText = tooltip;
+	    this.statusbar.label = label;
+	    this.statusbar.tooltipText = tooltip;
 	    itasanotifier.showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
 	}
 	// JUST ONE SUB
@@ -433,14 +467,14 @@ var itasanotifier = {
 	    var label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.thereIs1Sub");
 	    var tooltip = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.yourSub") + "\n" + tt2str;
 
-	    statusbar.label = label;
-	    statusbar.tooltipText = tooltip;
+	    this.statusbar.label = label;
+	    this.statusbar.tooltipText = tooltip;
 	    itasanotifier.showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
 	}
 	// NO SUBS
 	else {
-	    statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
-	    statusbar.tooltipText = itasanotifier.latest20subs;
+	    this.statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
+	    this.statusbar.tooltipText = itasanotifier.latest20subs;
 	}
     },
 
@@ -533,7 +567,7 @@ var itasanotifier = {
 			    }
 			    
 			    itasanotifier.latest20subs = l20Subs;
-			    latest20subsNlinks = nodeList;
+			    this.latest20subsNlinks = nodeList;
 			}
 			else alert("lengths mismatch");
 			break;
@@ -549,7 +583,7 @@ var itasanotifier = {
 	    }
 	    else
 		onError();
-	}
+	};
 	req.send(null);
     }
 };
@@ -561,34 +595,6 @@ window.addEventListener("load", function(e) {
     
 }, false);
 
-function modifyToolbarButtons(modifier) {
-    var toolbar =
-	document.getElementById('nav-bar') ||
-	document.getElementById('mail-bar') ||
-	document.getElementById('mail-bar2');
-
-    if(!toolbar)
-	return;
-
-    if(toolbar.getAttribute('customizable') == 'true') {
-	var newSet = modifier(toolbar.currentSet);
-	if(!newSet)
-	    return;
-
-	toolbar.currentSet = newSet;
-	toolbar.setAttribute('currentset', toolbar.currentSet);
-	toolbar.ownerDocument.persist(toolbar.id, 'currentset');
-	try { BrowserToolboxCustomizeDone(true); } catch (e) {}
-    }
-}
-
-function addToolbarButton(buttonId) {
-    modifyToolbarButtons(function(set) {
-	if(set.indexOf(buttonId) == -1)
-	    return set.replace(/(urlbar-container|separator)/,
-			       buttonId + ',$1');
-    });
-}
 // MOZILLA FIREFOX FUNCTION OVERRIDE TO FIX A BUG
 // https://bugzilla.mozilla.org/show_bug.cgi?id=404124
 // http://tinyurl.com/c93sno
