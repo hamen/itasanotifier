@@ -332,7 +332,7 @@ var itasanotifier = {
     },
 
     stopTimer: function(e) {
-	timer.cancel();
+	this.timer.cancel();
 	dump("Timer deleted\n");
 	this.statusbar.label = "ItasaNotifier";
 	this.statusbar.tooltipText = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.updatesStopped");
