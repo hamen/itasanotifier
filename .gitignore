@@ -1,0 +1,5 @@
+*.xpi
+*install*
+Makefile
+roadmap.org
+update.rdf
