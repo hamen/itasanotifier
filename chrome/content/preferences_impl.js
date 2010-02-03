@@ -111,8 +111,9 @@ inp = {
      var format = subFormatsList.getItemAtIndex(formatIndex);
 
      var rowcount = myserieslist.getRowCount();
-     myserieslist.ensureIndexIsVisible(rowcount-1);
-
+     if (rowcount != 0)
+	 myserieslist.ensureIndexIsVisible(rowcount-1);
+     
      var tvseries = {
 	 title: item.label,
 	 format: format.label
@@ -129,7 +130,7 @@ inp = {
      try {
 	 myStoredList = inp.utils.getJSON().parse(prefs.getCharPref('seriesIWatch'));
      }
-     catch (e if e.message == "JSON.parse"){
+     catch (e){
 	 dump("myStoredList is empty or corrupted. Resetting...\n");
 	 prefs.setCharPref('seriesIWatch', "empty");
      }

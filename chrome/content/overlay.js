@@ -488,6 +488,9 @@ var itasanotifier = {
 	catch (e if e.message == "JSON.parse"){
 	    itasanotifier.alreadyDownloaded = "[]";
 	}
+	catch (e if e.message == "itasanotifier.utils.getJSON().parse"){
+	    itasanotifier.alreadyDownloaded = "[]";
+	}
 	
 	var newSeries = [];
 	if (itasanotifier.alreadyDownloaded === "[]" || itasanotifier.alreadyDownloaded === undefined){
