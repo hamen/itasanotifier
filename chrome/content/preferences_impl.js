@@ -144,7 +144,9 @@ inp = {
 
     removeFromMyList: function() {
 	var myserieslist = document.getElementById('myserieslist');
-	var itemToRemove = myserieslist.getItemAtIndex(myserieslist.selectedIndex).label;
+	if(myserieslist.selectedIndex !== -1){
+	var itemToRemove = myserieslist.getItemAtIndex(myserieslist.selectedIndex).label;	    
+	}
 	var myStoredList = inp.utils.getJSON().parse(prefs.getCharPref('seriesIWatch'));
 
 	if(myserieslist.selectedIndex == -1){
