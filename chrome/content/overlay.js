@@ -147,6 +147,10 @@ var itasanotifier = {
 			else if (itasanotifier.pref_savedseriesarray[n].title 
 				 === "Heroes" && nodes[i].title.indexOf("Novel") != -1 ){
 			}
+			// Special check for NCIS and NCIS L.A.
+			else if (itasanotifier.pref_savedseriesarray[n].title 
+				 === "NCIS" && nodes[i].title.indexOf("Angeles") != -1){
+			}
 			else{
 			    var regexBluray = /(Bluray)/;
 			    var regex720p = /(720p)/;
