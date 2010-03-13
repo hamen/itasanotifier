@@ -35,13 +35,17 @@ const urlSubs = "http://www.italiansubs.net/index.php?option=com_remository&Item
 var inp = itasanotifierPreferences;
 
 inp = {
- loader : Cc['@mozilla.org/moz/jssubscript-loader;1'].getService(Ci.mozIJSSubScriptLoader),
- utils : {},
- initList: '',
- listHasChanged: '',
- pref_savedseriesarray: '',
- seriesarray: new Array(),
- unsavedSeriesArray: new Array(),
+    loader : Cc['@mozilla.org/moz/jssubscript-loader;1'].getService(Ci.mozIJSSubScriptLoader),
+    itasaProp: Components
+	.classes["@mozilla.org/intl/stringbundle;1"]
+	.getService(Components.interfaces.nsIStringBundleService)
+	.createBundle("chrome://itasanotifier/locale/itasanotifier.properties"),
+    utils : {},
+    initList: '',
+    listHasChanged: '',
+    pref_savedseriesarray: '',
+    seriesarray: new Array(),
+    unsavedSeriesArray: new Array(),
     itasaProp: Components
 	.classes["@mozilla.org/intl/stringbundle;1"]
 	.getService(Components.interfaces.nsIStringBundleService)
@@ -79,7 +83,7 @@ inp = {
 	      var tvseries = {
 		  title: temp,
 		  format: ''
-	      }
+	      };
 	      inp.seriesarray[i] = tvseries;
 	    //dump(seriesarray[i] + "\n");
 	  }
@@ -137,7 +141,7 @@ inp = {
 
      myStoredList.push(tvseries);
      
-     myStoredList.sort(inp.sort_by('title', false, function(a){return a.toUpperCase()}));
+     myStoredList.sort(inp.sort_by('title', false, function(a){return a.toUpperCase();}));
 
      prefs.setCharPref('seriesIWatch', inp.utils.getJSON().stringify(myStoredList));
  },
@@ -249,7 +253,7 @@ inp = {
 	    if (a>b) return reverse * 1;
 	    return 0;
 	    
-	}
+	};
     },
 
     init: function() {
@@ -270,5 +274,54 @@ inp = {
 	       || inp.pref_savedseriesarray == "empty") {
 	    alert(inp.itasaProp.GetStringFromName("itasanotifier.noseries"));
 	}
+    },
+    
+    importList: function() {
+	var nsIFilePicker = Components.interfaces.nsIFilePicker;
+	var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+	fp.init(window, "Select a File", nsIFilePicker.modeOpen);
+	var res = fp.show();
+
+	if (res == nsIFilePicker.returnOK){
+	    var fileContent = "";
+	    var fileIStream = Components.classes["@mozilla.org/network/file-input-stream;1"].
+                createInstance(Components.interfaces.nsIFileInputStream);
+	    var cstream = Components.classes["@mozilla.org/intl/converter-input-stream;1"].
+                createInstance(Components.interfaces.nsIConverterInputStream);
+	    fileIStream.init(fp.file, -1, 0, 0);
+	    cstream.init(fileIStream, "UTF-8", 0, 0);
+	    
+	    let (str = {}) {
+		cstream.readString(-1, str);
+		fileContent = str.value;
+	    };
+	    cstream.close();
+	    prefs.setCharPref('seriesIWatch', fileContent);
+
+	    alert(inp.itasaProp.GetStringFromName("itasanotifier.success"));
+	    var prefwindow = document.getElementById('itasanotifierPreferences');
+	    prefwindow.cancelDialog();
+	}
+    },
+    exportList: function(){
+	var nsIFilePicker = Components.interfaces.nsIFilePicker;
+	var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+	fp.init(window, "Select a File", nsIFilePicker.modeSave);
+	var res = fp.show();
+	var series = inp.utils.getJSON().parse(prefs.getCharPref('seriesIWatch'));
+
+	if (res == nsIFilePicker.returnOK || res == nsIFilePicker.returnReplace){
+	    var fileOStream = Components.classes["@mozilla.org/network/file-output-stream;1"].
+                createInstance(Components.interfaces.nsIFileOutputStream);
+
+	    // use 0x02 | 0x10 to open file for appending.
+	    fileOStream.init(fp.file, 0x02 | 0x08 | 0x20, 0666, 0); 
+
+	    var converter = Components.classes["@mozilla.org/intl/converter-output-stream;1"].
+                createInstance(Components.interfaces.nsIConverterOutputStream);
+	    converter.init(fileOStream, "UTF-8", 0, 0);
+	    converter.writeString(inp.utils.getJSON().stringify(series));
+	    converter.close(); 
+	}
     }
-}
+};

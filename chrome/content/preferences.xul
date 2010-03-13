@@ -34,10 +34,10 @@
 
 	<label value="&thelist.label;" />
 	<listbox id="thelist">
-	  
 	</listbox>
+
 	<button label="&getlistButton.label;"
-	    oncommand="itasanotifierPreferences.inp.getList()"/>
+		oncommand="itasanotifierPreferences.inp.getList()"/>
       </vbox>
       <vbox>
 	<label value="&seriesIWatch.format;" />
@@ -74,6 +74,14 @@
 	     hidden="true"
 	     flex="1"
 	     value="&listHasChanged.label;" />
+    </hbox>
+    <hbox>
+      <hbox>
+	<button label="&importList.label;"
+		oncommand="itasanotifierPreferences.inp.importList()"/>
+	<button label="&exportList.label;"
+		oncommand="itasanotifierPreferences.inp.exportList()"/>
+      </hbox>
     </hbox>
     <!-- TEST BUTTON
     <button label="Name N Ids" 

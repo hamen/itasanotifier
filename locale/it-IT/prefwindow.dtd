@@ -9,4 +9,5 @@
 <!ENTITY saveMyListButton.label "Salva">
 <!ENTITY listHasChanged.label "Puoi scegliere il formato delle serie!
 			       Ricrea la tua lista!">
-
+<!ENTITY importList.label "Importa">
+<!ENTITY exportList.label "Esporta">
