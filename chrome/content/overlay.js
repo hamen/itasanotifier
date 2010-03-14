@@ -429,7 +429,6 @@ var itasanotifier = {
 	for(i=0; i < l20s_a.length; i++){
 	    latest20subs += l20s_a[i].title + "\n";
 	}
-	
 	// CHECK THIS FUNCTION
 	// CHECK tt
 	tt = this.purgeList(tt);
@@ -445,7 +444,6 @@ var itasanotifier = {
 	    itasaStatusPopupDownload.disabled = false;
 	    itasanotifier.getList();
 	}
-	
 	this.setLabelNTooltip(check, matches, tt, tt2str);
     },
 
@@ -566,13 +564,12 @@ var itasanotifier = {
 			var links = req.responseXML.getElementsByTagName("link");
 
 			if(links.length == titles.length){
-			    for(i=1, n=0; i < titles.length; i++, n++){
+			    for(i=2, n=0; i < titles.length; i++, n++){
 				nodeList.push({
 				    title: titles[i].textContent,
 				    link: links[i].textContent});
 				l20Subs += titles[i].textContent + "\n";
 			    }
-			    
 			    itasanotifier.latest20subs = l20Subs;
 			    this.latest20subsNlinks = nodeList;
 			}
