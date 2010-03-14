@@ -24,7 +24,7 @@ sorgenti, distribuiti con licenza GPL:
 oppure inviare una mail ad itasanotifier [at] hamen [dot] org
 
 
-CHANGELOG
+Changelog
 =========
 
 2010031318
