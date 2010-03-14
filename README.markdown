@@ -21,13 +21,14 @@ sorgenti, distribuiti con licenza GPL:
 
 [http://github.com/hamen/itasanotifier/issues](http://github.com/hamen/itasanotifier/issues)
 
-o inviare una mail ad itasanotifier [at] hamen [dot] org
+oppure inviare una mail ad itasanotifier [at] hamen [dot] org
 
 
 CHANGELOG
 =========
 
-* 2010031318
+2010031318
+----------
 Nel menu Preferenze, sono ora disponibili le funzioni per importare
 ed esportare la lista delle tue serie preferite.
 
