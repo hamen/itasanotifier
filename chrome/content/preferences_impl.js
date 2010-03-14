@@ -92,9 +92,14 @@ inp = {
 	  dump("Error loading page\n");
       }
   
-      inp.initList = document.getElementById('thelist');   
-      inp.seriesarray.forEach(inp.appendToList);
+	inp.initList = document.getElementById('thelist');  
 
+	if (inp.initList.getRowCount() !== 0){
+	    while(inp.initList.getRowCount() !== 0){
+		inp.initList.removeItemAt(0);		
+	    }
+	}
+	inp.seriesarray.forEach(inp.appendToList);
     };
     req.send(null);
   },
