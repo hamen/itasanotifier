@@ -350,9 +350,13 @@ var itasanotifier = {
 	// toDownload is an array equal to alreadyDownloaded + new not downloaded subs
 	// Fetch alreadyDownloaded from prefs and use its length as starting index
 	// for toDownload cycle. In this way, we avoid to re-download old subs.
-
-	var alreadyDownloaded = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('alreadyDownloaded'));
-	
+	var alreadyDownloaded;
+	try {
+	    alreadyDownloaded = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('alreadyDownloaded'));	    
+	} catch (e) {
+	    itasanotifier.pref.setCharPref('alreadyDownloaded', "");
+	    alreadyDownloaded = [];
+	}
 	for(var i=alreadyDownloaded.length; i < toDownload.length; i++){
 	    gBrowser.addTab(toDownload[i].link);
 	    gBrowser.selectedTab = gBrowser.newTab;
