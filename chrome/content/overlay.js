@@ -347,21 +347,48 @@ var itasanotifier = {
     },
 
     downloadSubs: function(e) {
-	// toDownload is an array equal to alreadyDownloaded + new not downloaded subs
-	// Fetch alreadyDownloaded from prefs and use its length as starting index
-	// for toDownload cycle. In this way, we avoid to re-download old subs.
 	var alreadyDownloaded;
+	var notDownloadedYet = [];
+	
 	try {
-	    alreadyDownloaded = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('alreadyDownloaded'));	    
-	} catch (e) {
-	    itasanotifier.pref.setCharPref('alreadyDownloaded', "");
-	    alreadyDownloaded = [];
+	    alreadyDownloaded = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('alreadyDownloaded'));
 	}
-	for(var i=alreadyDownloaded.length; i < toDownload.length; i++){
-	    gBrowser.addTab(toDownload[i].link);
-	    gBrowser.selectedTab = gBrowser.newTab;
+	catch (e if e.message == "JSON.parse"){
+	    //dump("downloadSubs error: " + e.message + "\n");
+	    itasanotifier.pref.setCharPref('alreadyDownloaded', "[]");
+	    return;
 	}
-	this.clearStatusBar();
+
+	if(alreadyDownloaded.length === 0){
+	    //dump("alreadyDownloaded is []\n");
+	    for(var i=0; i < toDownload.length; i++){
+		gBrowser.addTab(toDownload[i].link);
+		gBrowser.selectedTab = gBrowser.newTab;
+	    }
+	    this.clearStatusBar();
+	}
+	else {
+	    var count;
+
+	    for(var i = 0; i < toDownload.length; i++, count = 0){
+		for(var n = 0; n < alreadyDownloaded.length; n++){
+		    //dump("toDownload.title: " + toDownload[i].title + " alreadyDownloaded.title: " + alreadyDownloaded[n].title + "\n");
+		    if(toDownload[i].title.indexOf(alreadyDownloaded[n].title) != -1) {
+			count++;
+		    }
+		}
+		if(count == 0){
+		    notDownloadedYet.push(toDownload[i]);
+		}
+	    }
+	    //dump("notDownloadedYet: " + notDownloadedYet.toSource() + "count : " + count + "\n");
+	 
+	    for(var j=0; j < notDownloadedYet.length; j++){
+		gBrowser.addTab(notDownloadedYet[j].link);
+		gBrowser.selectedTab = gBrowser.newTab;
+	    }
+	    this.clearStatusBar();
+	}
     },
 
     showNotificationAlert: function(lastSub) {
