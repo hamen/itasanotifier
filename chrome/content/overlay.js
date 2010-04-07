@@ -320,7 +320,8 @@ var itasanotifier = {
 
     clearStatusBar: function(e) {
 	// Reset statusbar label and tooltip text
-	this.statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
+	//this.statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
+	this.statusbar.label = "";
 	this.statusbar.tooltipText = itasanotifier.latest20subs;
 
 	// Disable "Go to download page" menu item
@@ -347,6 +348,13 @@ var itasanotifier = {
     },
 
     downloadSubs: function(e) {
+	function downloadFrom (array){
+	    for(var i=0; i < array.length; i++){
+		gBrowser.addTab(array[i].link);
+		gBrowser.selectedTab = gBrowser.newTab;
+	    }
+	    itasanotifier.clearStatusBar();
+	}
 	var alreadyDownloaded;
 	var notDownloadedYet = [];
 	
@@ -356,39 +364,35 @@ var itasanotifier = {
 	catch (e if e.message == "JSON.parse"){
 	    //dump("downloadSubs error: " + e.message + "\n");
 	    itasanotifier.pref.setCharPref('alreadyDownloaded', "[]");
+	    downloadFrom(toDownload);
 	    return;
 	}
 
 	if(alreadyDownloaded.length === 0){
 	    //dump("alreadyDownloaded is []\n");
-	    for(var i=0; i < toDownload.length; i++){
-		gBrowser.addTab(toDownload[i].link);
-		gBrowser.selectedTab = gBrowser.newTab;
-	    }
-	    this.clearStatusBar();
+	    downloadFrom(toDownload);
 	}
 	else {
-	    var count;
+	    var count = 0;
 
 	    for(var i = 0; i < toDownload.length; i++, count = 0){
 		for(var n = 0; n < alreadyDownloaded.length; n++){
-		    //dump("toDownload.title: " + toDownload[i].title + " alreadyDownloaded.title: " + alreadyDownloaded[n].title + "\n");
 		    if(toDownload[i].title.indexOf(alreadyDownloaded[n].title) != -1) {
 			count++;
+			// dump("toDownload.title: " + toDownload[i].title +
+			//      " matches alreadyDownloaded.title: " + alreadyDownloaded[n].title + "\n" +
+			//      "count: " + count + "\n");
+			continue;
 		    }
 		}
-		if(count == 0){
+		if(count === 0){
 		    notDownloadedYet.push(toDownload[i]);
 		}
 	    }
-	    //dump("notDownloadedYet: " + notDownloadedYet.toSource() + "count : " + count + "\n");
-	 
-	    for(var j=0; j < notDownloadedYet.length; j++){
-		gBrowser.addTab(notDownloadedYet[j].link);
-		gBrowser.selectedTab = gBrowser.newTab;
-	    }
-	    this.clearStatusBar();
+	    //dump("notDownloadedYet: " + notDownloadedYet.toSource() + "count : " + ++count + "\n");
+	    downloadFrom(notDownloadedYet);
 	}
+	clearStatusBar();
     },
 
     showNotificationAlert: function(lastSub) {
