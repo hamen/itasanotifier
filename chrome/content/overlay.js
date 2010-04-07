@@ -312,7 +312,7 @@ var itasanotifier = {
     
     resetTooltip: function(e) {
 	var statusbar = document.getElementById('itasa-status-bar');
-	statusbar.label = "ItasaNotifier";
+	statusbar.label = "";
     },
     aboutItasaNotifier: function(e){
 	window.openDialog("chrome://itasanotifier/content/about.xul");
@@ -339,7 +339,7 @@ var itasanotifier = {
     stopTimer: function(e) {
 	this.timer.cancel();
 	dump("Timer deleted\n");
-	this.statusbar.label = "ItasaNotifier";
+	this.statusbar.label = "";
 	this.statusbar.tooltipText = itasanotifier.itasaProp.GetStringFromName("itasanotifier.statusbar.updatesStopped");
     },
 
@@ -510,7 +510,8 @@ var itasanotifier = {
 	}
 	// NO SUBS
 	else {
-	    this.statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
+	    //this.statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
+	    this.statusbar.label = "";
 	    this.statusbar.tooltipText = itasanotifier.latest20subs;
 	}
     },
