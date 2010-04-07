@@ -510,7 +510,8 @@ var itasanotifier = {
 	}
 	// NO SUBS
 	else {
-	    this.statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
+	    //this.statusbar.label = itasanotifier.itasaProp.GetStringFromName("itasanotifier.title");
+	    this.statusbar.label = "";
 	    this.statusbar.tooltipText = itasanotifier.latest20subs;
 	}
     },
