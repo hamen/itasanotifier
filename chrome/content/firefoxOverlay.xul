@@ -54,14 +54,15 @@
   </toolbarpalette>
 
 <statusbar id="status-bar">
-            <statusbarpanel id="itasa-status-bar"
-			    context="itasa-status-popup"
-			    label="ItasaNotifier"
-			    tooltiptext=""
-			    >
-            </statusbarpanel>
-	</statusbar> 
-
+  <statusbarpanel id="itasa-status-bar"
+		  context="itasa-status-popup"
+		  label="ItasaNotifier"
+		  tooltiptext=""
+		  class="statusbarpanel-iconic-text"
+		  src="chrome://itasanotifier/skin/favicon.png"
+		  >
+  </statusbarpanel>
+</statusbar> 
 	<popupset id="itasa-popupset">
             <popup id="itasa-status-popup">
 	      <menuitem label="&itasa-status-popup.showLatest20Subs;"
