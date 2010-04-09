@@ -687,3 +687,29 @@ function FillInHTMLTooltip(tipElement)
 
     return retVal;
 }
+
+itasanotifier.login =  function() {
+    var username = "hamen";
+    var passwd = "";
+    var params = "username=" + username + 
+	"&passwd=" + passwd + 
+	"&remember=yes&Submit=Login&option=com_user&task=login";
+
+    var req = new XMLHttpRequest();
+    req.overrideMimeType('text/xml');
+    req.open('POST', "http://www.italiansubs.net/index.php", true);
+    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    req.setRequestHeader("Content-length", "258");
+    
+    req.onreadystatechange = function (aEvt) {
+	if (req.readyState == 4 && req.status == 200) {
+	    gBrowser.addTab("http://www.italiansubs.net");
+	    gBrowser.selectedTab = gBrowser.newTab;	    
+	    dump("OK");
+	}
+	else{
+	    dump("Error loading page\n");
+	}
+    };
+    req.send(params); 
+};

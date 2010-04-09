@@ -87,6 +87,8 @@
 
               <menuitem label="&itasa-status-popup.about;"
 			oncommand="itasanotifier.aboutItasaNotifier()"/>
+	      <menuitem label="LOGIN"
+			oncommand="itasanotifier.login()"/>
             </popup>
         </popupset>
 
