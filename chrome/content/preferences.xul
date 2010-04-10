@@ -27,69 +27,111 @@
   <prefpane id="pane1"
 	    onpaneload="itasanotifierPreferences.inp.init()"
 	    label="&pane1.title;">
-   
-    <hbox> <!-- hbox contains 3 vbox elements-->
-      <vbox flex="1">
-	<!-- Left vbox contains 4 elements-->
 
-	<label value="&thelist.label;" />
-	<listbox id="thelist">
-	</listbox>
+    <tabbox  flex="1">
+      <tabs >
+	<tab label="&seriesTab.label;" />
+	<tab label="&accountTab.label;" />
+      </tabs>
+      <tabpanels flex="1" >
+	<tabpanel id="seriesTab">
+	  <vbox>
+	    <hbox> <!-- hbox contains 3 vbox elements-->
+	      <vbox flex="1">
+		<!-- Left vbox contains 4 elements-->
 
-	<button label="&getlistButton.label;"
-		oncommand="itasanotifierPreferences.inp.getList()"/>
-      </vbox>
-      <vbox>
-	<label value="&seriesIWatch.format;" />
-	<menulist id="subFormatsList" label="HDTV">
-	  <menupopup>
-	    <menuitem label="HDTV" selected="true"/>
-	    <menuitem label="720p"/>
-	    <menuitem label="Hr"/>
-	    <menuitem label="Bluray"/>
-	    <menuitem label="DVDRip"/>
-	  </menupopup>
-	</menulist>
-      </vbox>
-      <!-- Central vbox contains 2 buttons-->
-      <vbox>
-	<spacer flex="1" />
-	<button label="&addToMyListButton.label;"
-		oncommand="itasanotifierPreferences.inp.addToMyList()"/>
-	<button label="&removeFromMyListButton.label;"
-	    oncommand="itasanotifierPreferences.inp.removeFromMyList()"/>
-	<spacer flex="1" />
-      </vbox>
+		<label value="&thelist.label;" />
+		<listbox id="thelist">
+		</listbox>
 
-      
-      <vbox flex="1">
-	<!-- Right vbox contains 2 elements-->
-	<label value="&seriesIWatch.label;" />
-      <listbox id="myserieslist">
-      </listbox>
-      </vbox>
-    </hbox>
-    <hbox>
-      <label id="listHasChanged"
-	     hidden="true"
-	     flex="1"
-	     value="&listHasChanged.label;" />
-    </hbox>
-    <hbox>
-      <hbox>
-	<button label="&importList.label;"
-		oncommand="itasanotifierPreferences.inp.importList()"/>
-	<button label="&exportList.label;"
-		oncommand="itasanotifierPreferences.inp.exportList()"/>
-      </hbox>
-    </hbox>
-    <!-- TEST BUTTON
-    <button label="Name N Ids" 
-	    oncommand="itasanotifierPreferences.getNamesNIds()"/>
-    -->
+		<button label="&getlistButton.label;"
+			oncommand="itasanotifierPreferences.inp.getList()"/>
+	      </vbox>
+	      <vbox>
+		<label value="&seriesIWatch.format;" />
+		<menulist id="subFormatsList" label="HDTV">
+		  <menupopup>
+		    <menuitem label="HDTV" selected="true"/>
+		    <menuitem label="720p"/>
+		    <menuitem label="Hr"/>
+		    <menuitem label="Bluray"/>
+		    <menuitem label="DVDRip"/>
+		  </menupopup>
+		</menulist>
+	      </vbox>
+	      <!-- Central vbox contains 2 buttons-->
+	      <vbox>
+		<spacer flex="1" />
+		<button label="&addToMyListButton.label;"
+			oncommand="itasanotifierPreferences.inp.addToMyList()"/>
+		<button label="&removeFromMyListButton.label;"
+			oncommand="itasanotifierPreferences.inp.removeFromMyList()"/>
+		<spacer flex="1" />
+	      </vbox>
+
+	      
+	      <vbox flex="1">
+		<!-- Right vbox contains 2 elements-->
+		<label value="&seriesIWatch.label;" />
+		<listbox id="myserieslist">
+		</listbox>
+	      </vbox>
+	    </hbox>
+	    <hbox>
+	      <label id="listHasChanged"
+		     hidden="true"
+		     flex="1"
+		     value="&listHasChanged.label;" />
+	    </hbox>
+	    <hbox>
+	      <hbox>
+		<button label="&importList.label;"
+			oncommand="itasanotifierPreferences.inp.importList()"/>
+		<button label="&exportList.label;"
+			oncommand="itasanotifierPreferences.inp.exportList()"/>
+	      </hbox>
+	    </hbox>
+	  </vbox>
+	</tabpanel>
+	<tabpanel>
+	  <vbox flex="1" style="overflow: auto" >
+
+	    <hbox align="center">
+	      <label style="width:10em" value="&username.label;:" />
+	      <textbox id="username"/>
+	    </hbox>
+
+	    <hbox align="center">
+	      <label style="width:10em" value="&password.label;:" />
+	      <textbox id="password" type="password"/>
+	    </hbox>
+
+	    <hbox>
+	      <button label="&save.label;" accesskey="S"
+		      oncommand="itasanotifierPreferences.inp.saveAccount()"/>
+	    </hbox>
+	    <hbox>
+	      <label id="saved" value="&savedAccount.label;" hidden="true"/>
+	    </hbox>
+	    <hbox>
+	      <button label="&remove.label;" accesskey="R"
+		      oncommand="itasanotifierPreferences.inp.removeAccount()"/>
+	    </hbox>
+	    <hbox>
+	      <label id="removed" value="&removedAccount.label;" hidden="true"/>
+	    </hbox>
+	    <hbox>
+	      <text class="text-link" 
+		    value="&register.label;"
+		    onclick="window.open('http://italiansubs.net/forum/index.php?action=register'); window.close();"/>
+	    </hbox>
+	  </vbox>
+	</tabpanel>
+      </tabpanels>
+    </tabbox>
+    
   </prefpane>
   
-
   <script type="application/x-javascript;version=1.7" src="preferences.js"/>
 </prefwindow>
 

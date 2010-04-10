@@ -51,6 +51,13 @@ inp = {
 	.getService(Components.interfaces.nsIStringBundleService)
 	.createBundle("chrome://itasanotifier/locale/itasanotifier.properties"),
 
+    passwordManager : Components.
+	classes["@mozilla.org/login-manager;1"].
+        getService(Components.interfaces.nsILoginManager),
+    nsLoginInfo : new Components.Constructor("@mozilla.org/login-manager/loginInfo;1",
+                                         Components.interfaces.nsILoginInfo,
+                                         "init"),
+
     getList: function() {
 	var tvseries = {
 	 title: '',
@@ -279,6 +286,34 @@ inp = {
 	       || inp.pref_savedseriesarray == "empty") {
 	    alert(inp.itasaProp.GetStringFromName("itasanotifier.noseries"));
 	}
+
+	// Account tab
+	var hostname = 'chrome://itasanotifier/content/';
+	var formSubmitURL = null;
+	var httprealm = 'Account';
+	var username;
+	var password;
+	
+	try {
+	    username = inp.utils.getJSON().parse(prefs.getCharPref('username'));
+	    if (username){
+		_('username').value = username;
+
+		var logins = inp.passwordManager.findLogins({}, hostname, formSubmitURL, httprealm);
+				
+		for (var i = 0; i < logins.length; i++) {
+		    if (logins[i].username == username) {
+			password = logins[i].password;
+			break;
+		    }
+		}
+		if(password) {
+		    _('password').value = password;
+		    }
+	    }
+	} catch (e) {
+	    dump("No username\n");
+	}
     },
     
     importList: function() {
@@ -330,3 +365,56 @@ inp = {
 	}
     }
 };
+
+inp.saveAccount = function() {
+    var username = _('username').value;
+    var password = _('password').value;
+    var loginInfo;
+
+    if (username.length > 0 && password.length > 0) {
+	loginInfo = new inp.nsLoginInfo('chrome://itasanotifier/content/',
+					   null, 'Account',
+					   username, password, "", "");	
+	inp.passwordManager.addLogin(loginInfo);  
+	prefs.setCharPref('username', inp.utils.getJSON().stringify(username));
+	
+	_('saved').hidden = false;
+
+	// dump("username: " + loginInfo.username + 
+	//       " password: " + loginInfo.password + 
+	//       " formSubmitURL: " + loginInfo.formSubmitURL +
+	//       " httpRealm: " + loginInfo.httpRealm +
+	//       " hostname: " + loginInfo.hostname);
+    }
+};
+
+inp.removeAccount = function() {
+    var hostname = 'chrome://itasanotifier/content/';
+    var formSubmitURL = null;
+    var httprealm = 'Account';
+    var username = _('username').value;
+
+    try {
+	var logins = inp.passwordManager.findLogins({}, hostname, formSubmitURL, httprealm);
+	
+	for (var i = 0; i < logins.length; i++) {
+	    if (logins[i].username == username) {
+		inp.passwordManager.removeLogin(logins[i]);
+
+		// Cleaning up prefs and UI
+		prefs.setCharPref('username', "");
+		_('username').value = "";
+		_('password').value = "";
+		_('removed').hidden = false;
+		break;
+	    }
+	}
+    }
+    catch(e) {
+	dump(e.message);
+    }
+};
+
+function _(id) {
+    return document.getElementById(id);
+}

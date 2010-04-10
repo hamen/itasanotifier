@@ -34,7 +34,13 @@ var itasanotifier = {
     alertsService: Components
 	.classes["@mozilla.org/alerts-service;1"]
 	.getService(Components.interfaces.nsIAlertsService),
-
+    
+    passwordManager : Components.
+	classes["@mozilla.org/login-manager;1"].
+        getService(Components.interfaces.nsILoginManager),
+    nsLoginInfo : new Components.Constructor("@mozilla.org/login-manager/loginInfo;1",
+                                         Components.interfaces.nsILoginInfo,
+                                         "init"),
     alreadyDownloaded: [],
     lastPopupLink: '',
     latest20subs: '',
@@ -349,6 +355,8 @@ var itasanotifier = {
 
     downloadSubs: function(e) {
 	function downloadFrom (array){
+	    itasanotifier.login();
+
 	    for(var i=0; i < array.length; i++){
 		gBrowser.addTab(array[i].link);
 		gBrowser.selectedTab = gBrowser.newTab;
@@ -392,7 +400,7 @@ var itasanotifier = {
 	    //dump("notDownloadedYet: " + notDownloadedYet.toSource() + "count : " + ++count + "\n");
 	    downloadFrom(notDownloadedYet);
 	}
-	clearStatusBar();
+	this.clearStatusBar();
     },
 
     showNotificationAlert: function(lastSub) {
@@ -689,27 +697,51 @@ function FillInHTMLTooltip(tipElement)
 }
 
 itasanotifier.login =  function() {
-    var username = "hamen";
-    var passwd = "";
+    var hostname = 'chrome://itasanotifier/content/';
+    var formSubmitURL = null;
+    var httprealm = 'Account';
+    var username;
+    var password;
+    
+    try {
+	username = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('username'));
+	if (username){
+	    var logins = itasanotifier.passwordManager.findLogins({}, hostname, formSubmitURL, httprealm);
+	    
+	    for (var i = 0; i < logins.length; i++) {
+		if (logins[i].username == username) {
+		    password = logins[i].password;
+		    break;
+		}
+	    }
+	}
+    } catch (e) {
+	dump(e.message + "\n");
+    }
+    
+    if (username && password) {
     var params = "username=" + username + 
-	"&passwd=" + passwd + 
+	"&passwd=" + password + 
 	"&remember=yes&Submit=Login&option=com_user&task=login";
 
     var req = new XMLHttpRequest();
     req.overrideMimeType('text/xml');
-    req.open('POST', "http://www.italiansubs.net/index.php", true);
+    req.open('POST', "http://www.italiansubs.net/index.php", false);
     req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     req.setRequestHeader("Content-length", "258");
     
     req.onreadystatechange = function (aEvt) {
 	if (req.readyState == 4 && req.status == 200) {
-	    gBrowser.addTab("http://www.italiansubs.net");
-	    gBrowser.selectedTab = gBrowser.newTab;	    
-	    dump("OK");
+	    // gBrowser.addTab("http://www.italiansubs.net");
+	    // gBrowser.selectedTab = gBrowser.newTab;	    
 	}
 	else{
 	    dump("Error loading page\n");
 	}
     };
-    req.send(params); 
+    req.send(params); 	
+    }
+    else {
+	dump("username: " + username + " password: " + password + "\n");
+    }
 };

@@ -11,3 +11,12 @@
 "You can select series format now! Create your new list!">
 <!ENTITY importList.label "Import">
 <!ENTITY exportList.label "Export">
+<!ENTITY seriesTab.label "TV Series">
+<!ENTITY accountTab.label "Account">
+<!ENTITY username.label "Username">
+<!ENTITY password.label "Password">
+<!ENTITY save.label "Save">
+<!ENTITY savedAccount.label "Account saved">
+<!ENTITY remove.label "Remove">
+<!ENTITY removedAccount.label "Account removed">
+<!ENTITY register.label "Register">

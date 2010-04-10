@@ -11,3 +11,12 @@
 			       Ricrea la tua lista!">
 <!ENTITY importList.label "Importa">
 <!ENTITY exportList.label "Esporta">
+<!ENTITY seriesTab.label "Serie TV">
+<!ENTITY accountTab.label "Profilo">
+<!ENTITY username.label "Nome Utente">
+<!ENTITY password.label "Password">
+<!ENTITY save.label "Salva">
+<!ENTITY savedAccount.label "Account aggiunto">
+<!ENTITY remove.label "Rimuovi">
+<!ENTITY removedAccount.label "Account rimosso">
+<!ENTITY register.label "Registrati">
