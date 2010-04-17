@@ -379,6 +379,7 @@ inp.saveAccount = function() {
 	prefs.setCharPref('username', inp.utils.getJSON().stringify(username));
 	
 	_('saved').hidden = false;
+	window.setTimeout("document.getElementById('saved').hidden = true", 2000);
 
 	// dump("username: " + loginInfo.username + 
 	//       " password: " + loginInfo.password + 
@@ -406,6 +407,7 @@ inp.removeAccount = function() {
 		_('username').value = "";
 		_('password').value = "";
 		_('removed').hidden = false;
+		window.setTimeout("document.getElementById('removed').hidden = true", 2000);
 		break;
 	    }
 	}

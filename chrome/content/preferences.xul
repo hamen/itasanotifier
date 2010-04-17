@@ -93,6 +93,7 @@
 	    </hbox>
 	  </vbox>
 	</tabpanel>
+	<!-- SECOND TAB - ACCOUNT -->
 	<tabpanel>
 	  <vbox flex="1" style="overflow: auto" >
 
@@ -107,18 +108,22 @@
 	    </hbox>
 
 	    <hbox>
-	      <button label="&save.label;" accesskey="S"
-		      oncommand="itasanotifierPreferences.inp.saveAccount()"/>
+	      <vbox>
+		<button label="&save.label;" accesskey="S"
+			oncommand="itasanotifierPreferences.inp.saveAccount()"/>
+	      </vbox>
+	      <vbox>
+		<label id="saved" value="&savedAccount.label;" hidden="true"/>
+	      </vbox>
 	    </hbox>
 	    <hbox>
-	      <label id="saved" value="&savedAccount.label;" hidden="true"/>
-	    </hbox>
-	    <hbox>
-	      <button label="&remove.label;" accesskey="R"
-		      oncommand="itasanotifierPreferences.inp.removeAccount()"/>
-	    </hbox>
-	    <hbox>
-	      <label id="removed" value="&removedAccount.label;" hidden="true"/>
+	      <vbox>
+		<button label="&remove.label;" accesskey="R"
+			oncommand="itasanotifierPreferences.inp.removeAccount()"/>
+	      </vbox>
+	      <vbox>
+		<label id="removed" value="&removedAccount.label;" hidden="true"/>
+	      </vbox>
 	    </hbox>
 	    <hbox>
 	      <text class="text-link" 
