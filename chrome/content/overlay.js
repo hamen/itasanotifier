@@ -23,6 +23,8 @@ var itasanotifier = {
     
     url: 'http://www.italiansubs.net/index.php?option=com_rsssub&type=lastsub',
     urlSubs: 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=9',
+    urlForum: 'http://www.italiansubs.net/forum/',
+
     pref: Components
 	.classes["@mozilla.org/preferences-service;1"]
 	.getService(Components.interfaces.nsIPrefService)
@@ -695,6 +697,21 @@ function FillInHTMLTooltip(tipElement)
 
     return retVal;
 }
+
+itasanotifier.goToSottotitoli = function () {
+    itasanotifier.login();
+
+    gBrowser.addTab(this.urlSubs);
+    gBrowser.selectedTab = gBrowser.newTab;
+};
+
+itasanotifier.goToForum = function () {
+    itasanotifier.login();
+
+    gBrowser.addTab(this.urlForum);
+    gBrowser.selectedTab = gBrowser.newTab;
+};
+
 
 itasanotifier.login =  function() {
     var hostname = 'chrome://itasanotifier/content/';

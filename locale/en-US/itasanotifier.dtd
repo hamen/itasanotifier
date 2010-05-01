@@ -8,6 +8,7 @@
 <!ENTITY itasa-status-popup.about "About">
 <!ENTITY itasa-status-popup.clearStatusBar "Mark as read">
 <!ENTITY itasa-status-popup.showOptions "Options">
-<!ENTITY itasa-status-popup.download "Go to download page">
+<!ENTITY itasa-status-popup.download "Download subs">
 <!ENTITY itasa-status-popup.showLatest20Subs "Show latest 20 subs">
-
+<!ENTITY itasa-status-popup.sottotitoli "Go to subs page">
+<!ENTITY itasa-status-popup.forum "Go to forum">

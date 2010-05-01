@@ -84,6 +84,11 @@
 
 	      <menuitem label="&itasa-status-popup.showOptions;"
 			oncommand="itasanotifier.onToolbarButtonCommand()"/>
+	      
+	      <menuitem label="&itasa-status-popup.sottotitoli;"
+			oncommand="itasanotifier.goToSottotitoli()"/>
+	      <menuitem label="&itasa-status-popup.forum;"
+			oncommand="itasanotifier.goToForum()"/>
 
               <menuitem label="&itasa-status-popup.about;"
 			oncommand="itasanotifier.aboutItasaNotifier()"/>
