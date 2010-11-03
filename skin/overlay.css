@@ -18,3 +18,12 @@
 {
   -moz-image-region: rect(24px 40px 40px 24px);
 }
+#itasa-status-popup
+{
+    border: 1px solid #333;
+    background: -moz-linear-gradient(top, #AECDFF, #5670A1);
+}
+.status-menu-items
+{
+    color: black;
+}

@@ -43,7 +43,7 @@
               insertafter="context-stop"
               oncommand="itasanotifier.onMenuItemCommand(event)"/>
   </popup>
--->
+  -->
 
   <toolbarpalette id="BrowserToolbarPalette">
   <toolbarbutton id="itasanotifier-toolbar-button"
@@ -63,34 +63,44 @@
 		  >
   </statusbarpanel>
 </statusbar> 
-	<popupset id="itasa-popupset">
-            <popup id="itasa-status-popup">
+<popupset id="itasa-popupset">
+  <popup id="itasa-status-popup">
 	      <menuitem label="&itasa-status-popup.showLatest20Subs;"
+			class="status-menu-items"
 			oncommand="itasanotifier.showLatest20Subs()"/>
 
               <menuitem label="&itasa-status-popup.start;"
+			class="status-menu-items"
 			oncommand="itasanotifier.fetchRSS()"/>
 			
 	      <menuitem label="&itasa-status-popup.stop;"
+			class="status-menu-items"
 			oncommand="itasanotifier.stopTimer()"/>
 
 	      <menuitem label="&itasa-status-popup.clearStatusBar;"
+			class="status-menu-items"
 			oncommand="itasanotifier.clearStatusBar()"/>
 
 	      <menuitem id="itasa-status-popup-download"
+			class="status-menu-items"
 			label="&itasa-status-popup.download;"
 			disabled="true"
 			oncommand="itasanotifier.downloadSubs()"/>
 
 	      <menuitem label="&itasa-status-popup.showOptions;"
+			class="status-menu-items"
 			oncommand="itasanotifier.onToolbarButtonCommand()"/>
 	      
 	      <menuitem label="&itasa-status-popup.sottotitoli;"
+			class="status-menu-items"
 			oncommand="itasanotifier.goToSottotitoli()"/>
+	      
 	      <menuitem label="&itasa-status-popup.forum;"
+			class="status-menu-items"
 			oncommand="itasanotifier.goToForum()"/>
 
               <menuitem label="&itasa-status-popup.about;"
+			class="status-menu-items"
 			oncommand="itasanotifier.aboutItasaNotifier()"/>
 	    </popup>
         </popupset>
