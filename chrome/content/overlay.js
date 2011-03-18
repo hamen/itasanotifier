@@ -164,6 +164,7 @@ var itasanotifier = {
 			    var regex720p = /(720p)/;
 			    var regexDVDRip = /(DVDRip)/;
 			    var regexHR = /(HR)/;
+			    var regexWEB_DL = /(WEB-DL)/;
 
 			    function rssFormat() {
 				var format = '';
@@ -172,17 +173,21 @@ var itasanotifier = {
 				if (match != -1)
 				    format = "720p";
 				
-				var match = nodes[i].title.search(/(Bluray)/);
+				match = nodes[i].title.search(/(Bluray)/);
 				if (match != -1)
 				    format = "Bluray";
 				
-				var match = nodes[i].title.search(/(DVDRip)/);
+				match = nodes[i].title.search(/(DVDRip)/);
 				if (match != -1)
 				    format = "DVDRip";
 
-				var match = nodes[i].title.search(/(HR)/);
+				match = nodes[i].title.search(/(HR)/);
 				if (match != -1)
 				    format = "HR";
+
+				match = nodes[i].title.search(/(WEB-DL)/);
+				if (match != -1)
+				    format = "WEB-DL";
 				
 				if (format === '') format = "HDTV";
 				
