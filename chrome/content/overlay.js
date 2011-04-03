@@ -24,6 +24,15 @@ var itasanotifier = {
     url: 'http://www.italiansubs.net/index.php?option=com_rsssub&type=lastsub',
     urlSubs: 'http://www.italiansubs.net/index.php?option=com_remository&Itemid=9',
     urlForum: 'http://www.italiansubs.net/forum/',
+    urlMyItasa: 'http://www.italiansubs.net/index.php?option=com_myitasa&Itemid=22',
+    urlHome:'http://www.italiansubs.net',
+    urlBlog:'http://blog.italiansubs.net/',
+    urlCalendario:'http://www.italiansubs.net/index.php?option=com_wrapper&view=wrapper&Itemid=21',
+    urlChat:'http://www.italiansubs.net/index.php?option=com_wrapper&view=wrapper&Itemid=104',
+    urlSchede:'http://www.italiansubs.net/index.php?option=com_info&Itemid=12',
+    urlSoftware:'http://www.italiansubs.net/index.php?option=com_content&view=article&id=6991&Itemid=88',
+    urlMerchandise:'http://www.italiansubs.net/index.php?option=com_wrapper&view=wrapper&Itemid=100',
+    urlAbout:'http://www.italiansubs.net/index.php?option=com_content&view=article&id=140&Itemid=16',
 
     pref: Components
 	.classes["@mozilla.org/preferences-service;1"]
@@ -702,21 +711,12 @@ function FillInHTMLTooltip(tipElement)
 
     return retVal;
 }
-
-itasanotifier.goToSottotitoli = function () {
+itasanotifier.goTo = function (url) {
     itasanotifier.login();
 
-    gBrowser.addTab(this.urlSubs);
+    gBrowser.addTab(url);
     gBrowser.selectedTab = gBrowser.newTab;
 };
-
-itasanotifier.goToForum = function () {
-    itasanotifier.login();
-
-    gBrowser.addTab(this.urlForum);
-    gBrowser.selectedTab = gBrowser.newTab;
-};
-
 
 itasanotifier.login =  function() {
     var hostname = 'chrome://itasanotifier/content/';

@@ -64,12 +64,59 @@
   </statusbarpanel>
 </statusbar> 
 <popupset id="itasa-popupset">
-  <popup id="itasa-status-popup">
+  <popup id="itasa-status-popup"
+	 class="itasa-status-popup">
+    <menu label="&itasa-status-popup.goTo;">
+      <menupopup
+	 class="itasa-status-popup">
+	<menuitem
+	   label="Home"
+	   oncommand="itasanotifier.goTo(itasanotifier.urlHome);"/>
+	<menuitem
+	   label="myITASA"
+	   oncommand="itasanotifier.goTo(itasanotifier.urlMyItasa);"/>
+	<menuitem
+	   label="Blog"
+	   oncommand="itasanotifier.goTo(itasanotifier.urlBlog);"/>
+	<menuitem
+	   label="Forum"
+	   oncommand="itasanotifier.goTo(itasanotifier.urlForum);"/>
+	
+	<menuitem
+	   label="Sottotitoli"
+	   oncommand="itasanotifier.goTo(itasanotifier.urlSubs);"/>
+
+	<menuitem
+	   label="Calendario"
+	   oncommand="itasanotifier.goTo(itasanotifier.urlCalendario);"/>
+
+	<menuitem
+	   label="Chat"
+	   oncommand="itasanotifier.goTo(itasanotifier.urlChat);"/>
+	
+	<menuitem
+	   label="Schede"
+	   oncommand="itasanotifier.goTo(itasanotifier.urlSchede);"/>
+
+	<menuitem
+	   label="Software"
+	   oncommand="itasanotifier.goTo(itasanotifier.urlSoftware);"/>
+
+	<menuitem
+	   label="Merchandise"
+	   oncommand="itasanotifier.goTo(itasanotifier.urlMerchandise);"/>
+
+	<menuitem
+	   label="About"
+	   oncommand="itasanotifier.goTo(itasanotifier.urlAbout);"/>
+      </menupopup>
+    </menu>
+
 	      <menuitem label="&itasa-status-popup.showLatest20Subs;"
 			class="status-menu-items"
 			oncommand="itasanotifier.showLatest20Subs()"/>
-
-              <menuitem label="&itasa-status-popup.start;"
+	      
+	      <menuitem label="&itasa-status-popup.start;"
 			class="status-menu-items"
 			oncommand="itasanotifier.fetchRSS()"/>
 			
@@ -91,15 +138,7 @@
 			class="status-menu-items"
 			oncommand="itasanotifier.onToolbarButtonCommand()"/>
 	      
-	      <menuitem label="&itasa-status-popup.sottotitoli;"
-			class="status-menu-items"
-			oncommand="itasanotifier.goToSottotitoli()"/>
-	      
-	      <menuitem label="&itasa-status-popup.forum;"
-			class="status-menu-items"
-			oncommand="itasanotifier.goToForum()"/>
-
-              <menuitem label="&itasa-status-popup.about;"
+	      <menuitem label="&itasa-status-popup.about;"
 			class="status-menu-items"
 			oncommand="itasanotifier.aboutItasaNotifier()"/>
 	    </popup>

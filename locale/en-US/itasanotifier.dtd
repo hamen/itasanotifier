@@ -10,5 +10,5 @@
 <!ENTITY itasa-status-popup.showOptions "Options">
 <!ENTITY itasa-status-popup.download "Download subs">
 <!ENTITY itasa-status-popup.showLatest20Subs "Show latest 20 subs">
-<!ENTITY itasa-status-popup.sottotitoli "Go to subs page">
-<!ENTITY itasa-status-popup.forum "Go to forum">
+<!ENTITY itasa-status-popup.sottotitoli "subs page">
+<!ENTITY itasa-status-popup.goTo "Go to...">

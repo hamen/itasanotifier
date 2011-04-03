@@ -1,6 +1,3 @@
-#itasanotifier-hello
-{
-}
 #itasanotifier-toolbar-button
 {
   list-style-image: url("chrome://itasanotifier/skin/toolbar-button.png");
@@ -18,12 +15,13 @@
 {
   -moz-image-region: rect(24px 40px 40px 24px);
 }
-#itasa-status-popup
-{
+
+.itasa-status-popup {
+    -moz-appearance: none !important;
     border: 1px solid #333;
     background: -moz-linear-gradient(top, #AECDFF, #5670A1);
 }
-.status-menu-items
-{
+
+.status-menu-items {
     color: black;
 }
