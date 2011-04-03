@@ -10,6 +10,6 @@
 <!ENTITY itasa-status-popup.showOptions "Opzioni">
 <!ENTITY itasa-status-popup.showLatest20Subs "Mostra gli ultimi 20 sub">
 <!ENTITY itasa-status-popup.download "Scarica i sottotitoli">
-<!ENTITY itasa-status-popup.sottotitoli "Via all'indice dei sub">
-<!ENTITY itasa-status-popup.forum "Via al forum">
+<!ENTITY itasa-status-popup.sottotitoli "Vai all'indice dei sub">
+<!ENTITY itasa-status-popup.forum "Vai al forum">
 
