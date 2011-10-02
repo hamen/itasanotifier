@@ -19,6 +19,7 @@
 <?xml-stylesheet href="chrome://itasanotifier/skin/overlay.css" type="text/css"?>
 <!DOCTYPE overlay SYSTEM "chrome://itasanotifier/locale/itasanotifier.dtd">
 <overlay id="itasanotifier-overlay"
+	 xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <window id="main-window">
     <popupset id="itasa-popupset"/>
@@ -59,8 +60,17 @@
 		  label="ItasaNotifier"
 		  tooltiptext=""
 		  class="statusbarpanel-iconic-text"
-		  src="chrome://itasanotifier/skin/favicon.png"
 		  >
+    <box>
+      <html:canvas
+	 id="myCanvas"
+	 width="15"
+	 height="15"
+	 style="border:1px solid black;"/>
+    </box>
+  </statusbarpanel>
+  <statusbarpanel>
+    
   </statusbarpanel>
 </statusbar> 
 <popupset id="itasa-popupset">

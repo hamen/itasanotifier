@@ -25,3 +25,7 @@
 .status-menu-items {
     color: black;
 }
+
+#myCanvas {
+    background-image: url("chrome://itasanotifier/skin/favicon.png");
+}

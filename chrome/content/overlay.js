@@ -233,29 +233,28 @@ var itasanotifier = {
     },
     
     fetchRSS: function() {
-	dump("Start fetching\n");
-	var count = 0;
-	var previousFirstElement;
+		var count = 0;
+		var previousFirstElement;
 
-	// First call after Firefox launch
-	this.getDataFrom(itasanotifier.url, this.amIInterested, function(status) {
-	    // report error
-	}, "titles+links");
+		// First call after Firefox launch
+		this.getDataFrom(itasanotifier.url, this.amIInterested, function(status) {
+			// report error
+		}, "titles+links");
 
-	// Event called periodically using the timer
-	var event
-	    = { notify: function(timer){
-		    itasanotifier.periodicallyFetch(timer); 
-		}
-	      };
-	
-	// creates the timer
-	this.timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
-	this.timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
+		// Event called periodically using the timer
+		var event
+			= { notify: function(timer){
+				itasanotifier.periodicallyFetch(timer); 
+			}
+			  };
+		
+		// creates the timer
+		this.timer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
+		this.timer.initWithCallback(event,10*60*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
     },
     
     onLoad: function() {
-	itasanotifier.loader.loadSubScript('chrome://itasanotifier/content/util_impl.js', itasanotifier.utils);
+		itasanotifier.loader.loadSubScript('chrome://itasanotifier/content/util_impl.js', itasanotifier.utils);
 	
 	// Add icon to toolbar on first install
 	// Should be replaced with new function suggested by bard
@@ -356,6 +355,7 @@ var itasanotifier = {
 	
 	itasanotifier.alreadyDownloaded = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('alreadyDownloaded'));
 	itasanotifier.showPopup = false;
+	itasanotifier.drawNumOnCanvas();
     },
 
     stopTimer: function(e) {
@@ -366,57 +366,59 @@ var itasanotifier = {
     },
 
     showLatest20Subs: function(e){
-	if(itasanotifier.latest20subs) alert(itasanotifier.latest20subs);
+		if(itasanotifier.latest20subs)
+			alert(itasanotifier.latest20subs);
     },
 
     downloadSubs: function(e) {
-	function downloadFrom (array){
-	    itasanotifier.login();
-
-	    for(var i=0; i < array.length; i++){
-		gBrowser.addTab(array[i].link);
-		gBrowser.selectedTab = gBrowser.newTab;
-	    }
-	    itasanotifier.clearStatusBar();
-	}
-	var alreadyDownloaded;
-	var notDownloadedYet = [];
-	
-	try {
-	    alreadyDownloaded = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('alreadyDownloaded'));
-	}
-	catch (e if e.message == "JSON.parse"){
-	    //dump("downloadSubs error: " + e.message + "\n");
-	    itasanotifier.pref.setCharPref('alreadyDownloaded', "[]");
-	    downloadFrom(toDownload);
-	    return;
-	}
-
-	if(alreadyDownloaded.length === 0){
-	    //dump("alreadyDownloaded is []\n");
-	    downloadFrom(toDownload);
-	}
-	else {
-	    var count = 0;
-
-	    for(var i = 0; i < toDownload.length; i++, count = 0){
-		for(var n = 0; n < alreadyDownloaded.length; n++){
-		    if(toDownload[i].title.indexOf(alreadyDownloaded[n].title) != -1) {
-			count++;
-			// dump("toDownload.title: " + toDownload[i].title +
-			//      " matches alreadyDownloaded.title: " + alreadyDownloaded[n].title + "\n" +
-			//      "count: " + count + "\n");
-			continue;
-		    }
+		itasanotifier.drawNumOnCanvas();
+		function downloadFrom (array){
+			itasanotifier.login();
+			
+			for(var i=0; i < array.length; i++){
+				gBrowser.addTab(array[i].link);
+				gBrowser.selectedTab = gBrowser.newTab;
+			}
+			itasanotifier.clearStatusBar();
 		}
-		if(count === 0){
-		    notDownloadedYet.push(toDownload[i]);
+		var alreadyDownloaded;
+		var notDownloadedYet = [];
+		
+		try {
+			alreadyDownloaded = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('alreadyDownloaded'));
 		}
-	    }
-	    //dump("notDownloadedYet: " + notDownloadedYet.toSource() + "count : " + ++count + "\n");
-	    downloadFrom(notDownloadedYet);
-	}
-	this.clearStatusBar();
+		catch (e){
+			//dump("downloadSubs error: " + e.message + "\n");
+			itasanotifier.pref.setCharPref('alreadyDownloaded', "[]");
+			downloadFrom(toDownload);
+			return;
+		}
+
+		if(alreadyDownloaded.length === 0){
+			//dump("alreadyDownloaded is []\n");
+			downloadFrom(toDownload);
+		}
+		else {
+			var count = 0;
+
+			for(var i = 0; i < toDownload.length; i++, count = 0){
+				for(var n = 0; n < alreadyDownloaded.length; n++){
+					if(toDownload[i].title.indexOf(alreadyDownloaded[n].title) != -1) {
+						count++;
+						// dump("toDownload.title: " + toDownload[i].title +
+						//      " matches alreadyDownloaded.title: " + alreadyDownloaded[n].title + "\n" +
+						//      "count: " + count + "\n");
+						continue;
+					}
+				}
+				if(count === 0){
+					notDownloadedYet.push(toDownload[i]);
+				}
+			}
+			//dump("notDownloadedYet: " + notDownloadedYet.toSource() + "count : " + ++count + "\n");
+			downloadFrom(notDownloadedYet);
+		}
+		this.clearStatusBar();
     },
 
     showNotificationAlert: function(lastSub) {
@@ -521,6 +523,7 @@ var itasanotifier = {
 	    this.statusbar.label = label;
 	    this.statusbar.tooltipText = tooltip;
 	    itasanotifier.showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
+	    itasanotifier.drawNumOnCanvas(""+matches);
 	}
 	// JUST ONE SUB
 	else if(check && matches==1){
@@ -531,6 +534,7 @@ var itasanotifier = {
 	    this.statusbar.label = label;
 	    this.statusbar.tooltipText = tooltip;
 	    itasanotifier.showNotificationAlert(tooltipArray[tooltipArray.length - 1]);
+	    itasanotifier.drawNumOnCanvas("1");
 	}
 	// NO SUBS
 	else {
@@ -552,8 +556,9 @@ var itasanotifier = {
 	}
 	catch (e if e.message == "itasanotifier.utils.getJSON().parse"){
 	    itasanotifier.alreadyDownloaded = "[]";
+	} catch (e if e.message == "JSON.parse: unexpected end of data") {
+		itasanotifier.alreadyDownloaded = "[]";
 	}
-	
 	var newSeries = [];
 	if (itasanotifier.alreadyDownloaded === "[]" || itasanotifier.alreadyDownloaded === undefined){
 	    //alert("alreadyDownloaded is undefined" + "\n" + "currentSeries is:" + currentSeries.toSource());
@@ -726,44 +731,54 @@ itasanotifier.login =  function() {
     var password;
     
     try {
-	username = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('username'));
-	if (username){
-	    var logins = itasanotifier.passwordManager.findLogins({}, hostname, formSubmitURL, httprealm);
+		username = itasanotifier.utils.getJSON().parse(itasanotifier.pref.getCharPref('username'));
+		if (username){
+			var logins = itasanotifier.passwordManager.findLogins({}, hostname, formSubmitURL, httprealm);
 	    
-	    for (var i = 0; i < logins.length; i++) {
-		if (logins[i].username == username) {
-		    password = logins[i].password;
-		    break;
+			for (var i = 0; i < logins.length; i++) {
+				if (logins[i].username == username) {
+					password = logins[i].password;
+					break;
+				}
+			}
 		}
-	    }
-	}
     } catch (e) {
-	dump(e.message + "\n");
+		dump(e.message + "\n");
     }
     
     if (username && password) {
-    var params = "username=" + username + 
-	"&passwd=" + password + 
-	"&remember=yes&Submit=Login&option=com_user&task=login";
 
-    var req = new XMLHttpRequest();
-    req.overrideMimeType('text/xml');
-    req.open('POST', "http://www.italiansubs.net/index.php", false);
-    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    req.setRequestHeader("Content-length", "258");
-    
-    req.onreadystatechange = function (aEvt) {
-	if (req.readyState == 4 && req.status == 200) {
-	    // gBrowser.addTab("http://www.italiansubs.net");
-	    // gBrowser.selectedTab = gBrowser.newTab;	    
-	}
-	else{
-	    dump("Error loading page\n");
-	}
-    };
-    req.send(params); 	
+		var formData = new FormData();
+		formData.append("username", username);
+		formData.append("passwd", password);
+		formData.append("remember", "yes");
+		formData.append("Submit", "Login");
+		formData.append("silent", "true");
+		formData.append("task", "login");
+		formData.append("option", "com_user");
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", "http://www.italiansubs.net/index.php");
+		xhr.send(formData);
     }
     else {
-	dump("username: " + username + " password: " + password + "\n");
+		alert("username: " + username + " password: " + password + "\n");
+    }
+};
+
+itasanotifier.drawNumOnCanvas = function(number) {
+    if(number){
+	var canvas = window.document.getElementById("myCanvas");
+	var ctx = canvas.getContext("2d");
+	ctx.fillStyle = "white";
+	ctx.fillRect(0,5,12,10);
+	ctx.fillStyle = "black";
+	ctx.font = "bold 8pt Arial";
+	ctx.fillText(number, 0, 14, 15);	
+    }
+    else {
+	var canvas = window.document.getElementById("myCanvas");
+	var ctx = canvas.getContext("2d");
+	ctx.clearRect(0,0,canvas.width,canvas.height);
     }
 };
