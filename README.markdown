@@ -1,4 +1,4 @@
-Itasa Notifier
+aItasa Notifier
 ==============
 Itasa Notifier e' una estensione per Mozilla Firefox che ti avvisa dei
 sottotitoli delle tue serie TV preferite rilasciati da
@@ -9,7 +9,7 @@ Italiansubs.net  e ti avvisera'.
 
 * Puoi installare Itasa Notifier direttamente da:
 
-[http://hamen.homelinux.org/itasanotifier/devel/itasanotifier-devel.xpi](http://hamen.homelinux.org/itasanotifier/devel/itasanotifier-devel.xpi)
+[https://addons.mozilla.org/en-US/firefox/addon/itasa-notifier/](https://addons.mozilla.org/en-US/firefox/addon/itasa-notifier/)
 
 * E' disponibile, naturalmente, un repository git per ottenere i
 sorgenti, distribuiti con licenza GPL:
@@ -22,13 +22,3 @@ sorgenti, distribuiti con licenza GPL:
 [http://github.com/hamen/itasanotifier/issues](http://github.com/hamen/itasanotifier/issues)
 
 oppure inviare una mail ad itasanotifier [at] hamen [dot] org
-
-
-Changelog
-=========
-
-2010031318
-----------
-Nel menu Preferenze, sono ora disponibili le funzioni per importare
-ed esportare la lista delle tue serie preferite.
-
